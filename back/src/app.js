@@ -1,5 +1,6 @@
 const express = require('express')
 const config = require('./config')
+const path = require('path')
 const app = express()
 
 //configuracion
@@ -7,6 +8,9 @@ app.set('port', config.app.port);
 
 //Middleware
 app.use(express.json()); // para parsear el req.body
+
+// Servir archivos estáticos desde el directorio uploads
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 
 //Modules

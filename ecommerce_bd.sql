@@ -1,4 +1,5 @@
-CREATE DATABASE ecommerce_bd;
+DROP DATABASE IF EXISTS ecommerce_bd;
+CREATE DATABASE IF NOT EXISTS ecommerce_bd;
 USE ecommerce_bd;
 
 CREATE TABLE usuarios (
@@ -12,20 +13,41 @@ CREATE TABLE usuarios (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+CREATE TABLE categorias(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    estado TINYINT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 CREATE TABLE productos (
 	id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
+    descripcion VARCHAR(255),
+    categoria_id INT NOT NULL,
     precio DOUBLE NOT NULL,
     stock INT NOT NULL,
     estado TINYINT DEFAULT 1,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (categoria_id) REFERENCES categorias(id)
+);
+
+CREATE TABLE imagenes_producto(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    producto_id INT NOT NULL,
+    imagen VARCHAR(255) DEFAULT 'uploads/images/productos/default.png',
+    estado TINYINT DEFAULT 1,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (producto_id) REFERENCES productos(id)
 );
 
 CREATE TABLE ventas(
 	id INT AUTO_INCREMENT PRIMARY KEY,
-    cliente_id INT,
-    fecha DATETIME,
+    cliente_id INT NOT NULL,
+    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
     estado TINYINT DEFAULT 1,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -47,8 +69,8 @@ CREATE TABLE detalle_ventas(
 
 CREATE TABLE carrito_compras(
 	id INT AUTO_INCREMENT PRIMARY KEY,
-    cliente_id INT,
-    producto_id INT,
+    cliente_id INT NOT NULL,
+    producto_id INT NOT NULL,
     cantidad INT DEFAULT 1,
     estado TINYINT DEFAULT 1,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -57,4 +79,7 @@ CREATE TABLE carrito_compras(
     FOREIGN KEY (producto_id) REFERENCES productos(id)
 );
 
+INSERT INTO usuarios(nombre, email, password, role) VALUES ('admin', 'admin@gmail.com', '$2b$10$UDlaey80wspx9mFmKi66ded7oyktvOE9sRVJD4D7FS.zXzki1NnFS', 1);
+INSERT INTO categorias(nombre) VALUES ('Tecnologia');
 
+SELECT * FROM usuarios;
