@@ -2,6 +2,7 @@ node_modules/
 
 back/node_modules/
 back/.env
+back/uploads/images/
 
 front/node_modules/
 front/.env
