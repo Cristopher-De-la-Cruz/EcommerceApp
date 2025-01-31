@@ -6,11 +6,12 @@ const auth = require('../../auth/auth');
 
 const get = async (req, res) => {
     try {
-        const tokenAccess = auth.AdminPermission(req);
-        if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, tokenAccess.message, 401));
+        const token = jwtHelper.getTokenPayload(req);
+        if (token.error) {
+            res.json(respuesta.error(req, res, token.message, 401));
             return;
         }
+        console.log(token);
         const items = await bd.query(`SELECT * FROM ${TABLA}`, []);
         res.json(respuesta.success(req, res, items, 200));
     } catch (err) {

@@ -17,10 +17,12 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 const usuarios = require('./modules/usuarios/routes');
 const categorias = require('./modules/categorias/routes');
 const productos = require('./modules/productos/routes');
+const carrito_compras = require('./modules/carrito_compras/routes');
 
 app.use('/api/usuarios', usuarios)
 app.use('/api/categorias', categorias)
 app.use('/api/productos', productos)
+app.use('/api/carrito_compras', carrito_compras)
 
 app.get('/', (req, res) => {
     res.send('Hola mundo desde el servidor');
