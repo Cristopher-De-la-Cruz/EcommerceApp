@@ -2,14 +2,13 @@ const TABLA = 'carrito_compras';
 const bd = require('../../DB/mysql');
 const respuesta = require('../../helper/respuestas');
 const validate = require('../../helper/validate');
-const auth = require('../../auth/auth');
 const jwtHelper = require('../../helper/jwt');
 
 const get = async (req, res) => {
     try {
         const token = jwtHelper.getTokenPayload(req);
         if (token.error) {
-            res.json(respuesta.error(req, res, token.message, 401));
+            res.json(respuesta.error(req, res, {message: token.message}, 401));
             return;
         }
         if(token.payload.user_role == 1){
@@ -17,7 +16,7 @@ const get = async (req, res) => {
             return;
         }
         const user_id = token.payload.user_id;
-        const items = await bd.query(`SELECT c.*, p.nombre, p.precio, p.stock, p.estado 
+        const items = await bd.query(`SELECT c.*, p.nombre, p.precio, p.stock, p.estado as estado_producto
                 FROM ${TABLA} AS c
                 INNER JOIN productos AS p ON c.producto_id = p.id
                 WHERE c.cliente_id = ? AND c.estado = 1`, [user_id]);
@@ -32,7 +31,7 @@ const store = async (req, res) => {
     try {
         const token = jwtHelper.getTokenPayload(req);
         if (token.error) {
-            res.json(respuesta.error(req, res, token.message, 401));
+            res.json(respuesta.error(req, res, {message: token.message}, 401));
             return;
         }
 
@@ -98,7 +97,7 @@ const changeCantidad = async (req, res) => {
     try {
         const token = jwtHelper.getTokenPayload(req);
         if (token.error) {
-            res.json(respuesta.error(req, res, token.message, 401));
+            res.json(respuesta.error(req, res, {message: token.message}, 401));
             return;
         }
         if(token.payload.user_role == 1){
@@ -157,7 +156,7 @@ const inactivate = async (req, res) => {
     try {
         const token = jwtHelper.getTokenPayload(req);
         if (token.error) {
-            res.json(respuesta.error(req, res, token.message, 401));
+            res.json(respuesta.error(req, res, {message: token.message}, 401));
             return;
         }
         

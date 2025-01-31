@@ -11,7 +11,7 @@ const get = async (req, res) => {
     try {
         const token = jwtHelper.getTokenPayload(req);
         if (token.error) {
-            res.json(respuesta.error(req, res, token.message, 401));
+            res.json(respuesta.error(req, res, { message: token.message }, 401));
             return;
         }
         const items = await bd.query(
@@ -44,7 +44,7 @@ const show = async (req, res) => {
         console.log(req.params['id']);
         const token = jwtHelper.getTokenPayload(req);
         if (token.error) {
-            res.json(respuesta.error(req, res, token.message, 401));
+            res.json(respuesta.error(req, res, { message: token.message }, 401));
             return;
         }
 
@@ -66,7 +66,7 @@ const show = async (req, res) => {
             FROM ${TABLA} AS p
             JOIN categorias AS c ON p.categoria_id = c.id
             WHERE p.id = ?;`, [req.params.id]);
-        
+
         producto = producto[0];
         let imagenes = await bd.query(`SELECT * FROM imagenes_producto WHERE producto_id = ? AND estado = 1`, [req.params.id]);
         imagenes = imagenes.map(imagen => {
@@ -84,7 +84,7 @@ const showWithAllImages = async (req, res) => {
         console.log(req.params['id']);
         const token = jwtHelper.getTokenPayload(req);
         if (token.error) {
-            res.json(respuesta.error(req, res, token.message, 401));
+            res.json(respuesta.error(req, res, { message: token.message }, 401));
             return;
         }
 
@@ -106,7 +106,7 @@ const showWithAllImages = async (req, res) => {
             FROM ${TABLA} AS p
             JOIN categorias AS c ON p.categoria_id = c.id
             WHERE p.id = ?;`, [req.params.id]);
-        
+
         producto = producto[0];
         let imagenes = await bd.query(`SELECT * FROM imagenes_producto WHERE producto_id = ?`, [req.params.id]);
         imagenes = imagenes.map(imagen => {
@@ -123,7 +123,7 @@ const store = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, tokenAccess.message, 401));
+            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
             return;
         }
 
@@ -211,7 +211,7 @@ const update = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, tokenAccess.message, 401));
+            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
             return;
         }
         const errors = await validate([
@@ -266,7 +266,7 @@ const toggleState = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, tokenAccess.message, 401));
+            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
             return;
         }
 
@@ -298,7 +298,7 @@ const inactiveImage = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, tokenAccess.message, 401));
+            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
             return;
         }
 
@@ -337,7 +337,7 @@ const reactiveImage = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, tokenAccess.message, 401));
+            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
             return;
         }
 
@@ -374,7 +374,7 @@ const deleteImage = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, tokenAccess.message, 401));
+            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
             return;
         }
 
@@ -420,7 +420,7 @@ const addImages = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, tokenAccess.message, 401));
+            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
             return;
         }
 

@@ -16,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"nombre\": \"cristopher\",\r\n  \"email\": \"cristopher@gmail.com\",\r\n  \"password\": \"password\"\r\n}",
+							"raw": "{\r\n  \"nombre\": \"cris\",\r\n  \"email\": \"cris@gmail.com\",\r\n  \"password\": \"password\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -598,6 +598,190 @@
 							]
 						},
 						"url": "http://localhost:4000/api/productos/addImages"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Carrito de Compras",
+			"item": [
+				{
+					"name": "Get",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJ1c2VyX3JvbGUiOjIsImV4cCI6MTA0MzAxMzE2Mzk3MTAwMDAwLCJleHBpcmVzIjpmYWxzZSwiaWF0IjoxNzM4MzU1MjczfQ.1SkZXslKdbpG6Wxa-JK5jtrTBMaH_3DbAfpDzaNf-Gc"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:4000/api/carrito_compras"
+					},
+					"response": []
+				},
+				{
+					"name": "Store",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJ1c2VyX3JvbGUiOjIsImV4cCI6MTA0MzAxMzE2Mzk3MTAwMDAwLCJleHBpcmVzIjpmYWxzZSwiaWF0IjoxNzM4MzU1MjczfQ.1SkZXslKdbpG6Wxa-JK5jtrTBMaH_3DbAfpDzaNf-Gc"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"producto_id\": 2,\r\n    \"cantidad\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:4000/api/carrito_compras"
+					},
+					"response": []
+				},
+				{
+					"name": "Change Cantidad",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VyX3JvbGUiOjIsImV4cCI6MTA0MzAxMDY5NzQ4MjAwMDAwLCJleHBpcmVzIjpmYWxzZSwiaWF0IjoxNzM4MzUxMTYyfQ.0wTihbDnfzFi45FsMCANAV3wrRf9pKfkOtaRJ-D212s"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"cantidad\": 3\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:4000/api/carrito_compras/changeCantidad/2"
+					},
+					"response": []
+				},
+				{
+					"name": "Inactivate",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VyX3JvbGUiOjIsImV4cCI6MTA0MzAxMDY5NzQ4MjAwMDAwLCJleHBpcmVzIjpmYWxzZSwiaWF0IjoxNzM4MzUxMTYyfQ.0wTihbDnfzFi45FsMCANAV3wrRf9pKfkOtaRJ-D212s"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:4000/api/carrito_compras/inactivate/3"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ventas",
+			"item": [
+				{
+					"name": "Get",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3JvbGUiOjEsImV4cCI6MTczODM1NTMwMTMyNSwiZXhwaXJlcyI6ZmFsc2UsImlhdCI6MTczODM1NTI0MX0.x2lzSEvb4ZeZHwrfZho45lGTHgKtaTdgCFTK6xTQ-uQ"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:4000/api/ventas"
+					},
+					"response": []
+				},
+				{
+					"name": "Store",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJ1c2VyX3JvbGUiOjIsImV4cCI6MTA0MzAxMzE2Mzk3MTAwMDAwLCJleHBpcmVzIjpmYWxzZSwiaWF0IjoxNzM4MzU1MjczfQ.1SkZXslKdbpG6Wxa-JK5jtrTBMaH_3DbAfpDzaNf-Gc"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fecha\": \"2025-03-31\",\r\n    \"lugar_entrega\": \"Mz. A lt 38. Nuestra Señora de la esperanza, Mi Perú\",\r\n    \"numero_tarjeta\": \"4557164982576325\",\r\n    \"fecha_expiracion\": \"12/26\",\r\n    \"csv\": \"123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:4000/api/ventas"
+					},
+					"response": []
+				},
+				{
+					"name": "Change Cantidad",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VyX3JvbGUiOjIsImV4cCI6MTczODM0NDYyNDgyMSwiZXhwaXJlcyI6ZmFsc2UsImlhdCI6MTczODM0NDU2NH0.9SmEf6VxPno0f387uOpXPBcUxmDbjsqJdqT0D1RkLOM"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"cantidad\": 3\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:4000/api/carrito_compras/changeCantidad/2"
+					},
+					"response": []
+				},
+				{
+					"name": "Inactivate",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VyX3JvbGUiOjIsImV4cCI6MTczODM0NDYyNDgyMSwiZXhwaXJlcyI6ZmFsc2UsImlhdCI6MTczODM0NDU2NH0.9SmEf6VxPno0f387uOpXPBcUxmDbjsqJdqT0D1RkLOM"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:4000/api/carrito_compras/inactivate/3"
 					},
 					"response": []
 				}

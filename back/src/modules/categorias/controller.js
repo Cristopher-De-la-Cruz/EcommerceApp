@@ -8,7 +8,7 @@ const get = async (req, res) => {
     try {
         const token = jwtHelper.getTokenPayload(req);
         if (token.error) {
-            res.json(respuesta.error(req, res, token.message, 401));
+            res.json(respuesta.error(req, res, { message: token.message }, 401));
             return;
         }
         console.log(token);
@@ -24,7 +24,7 @@ const store = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, tokenAccess.message, 401));
+            res.json(respuesta.error(req, res, {message: tokenAccess.message}, 401));
             return;
         }
 
@@ -58,7 +58,7 @@ const update = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, tokenAccess.message, 401));
+            res.json(respuesta.error(req, res, {message: tokenAccess.message}, 401));
             return;
         }
         const errors = await validate([
@@ -96,7 +96,7 @@ const toggleState = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, tokenAccess.message, 401));
+            res.json(respuesta.error(req, res, {message: tokenAccess.message}, 401));
             return;
         }
 

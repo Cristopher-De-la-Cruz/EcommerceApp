@@ -59,7 +59,7 @@ CREATE TABLE carrito_compras(
 CREATE TABLE ventas(
 	id INT AUTO_INCREMENT PRIMARY KEY,
     cliente_id INT NOT NULL,
-    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha DATE NOT NULL,
     lugar_entrega VARCHAR(255) NOT NULL,
     estado TINYINT DEFAULT 1,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -98,20 +98,12 @@ INSERT INTO categorias (nombre) VALUES
 ('Deportes'),
 ('Juguetes');
 
-INSERT INTO productos (nombre, descripcion, categoria_id, precio, stock) VALUES 
-('Smartphone X', 'Teléfono inteligente de última generación', 1, 699.99, 50),
-('Laptop Pro', 'Portátil de alto rendimiento para profesionales', 1, 1299.99, 30),
-('Camiseta Deportiva', 'Camiseta transpirable para actividades físicas', 2, 29.99, 100),
-('Sofá 3 plazas', 'Sofá cómodo de tres plazas, ideal para salas de estar', 3, 499.99, 20),
-('Bicicleta Montaña', 'Bicicleta para terrenos difíciles', 4, 299.99, 15),
-('Muñeco Articulado', 'Juguete ideal para niños mayores de 3 años', 5, 19.99, 200);
-
 INSERT INTO cuentas_bancarias (numero_tarjeta, fecha_expiracion, csv) VALUES 
-('4111111111111111', '12/26', '123'),
-('5500000000000004', '11/25', '456'),
-('340000000000009', '10/27', '789'),
-('30000000000004', '09/28', '321'),
-('6011000000000004', '08/30', '654');
+('4557164982576325', '12/26', '123'),
+('4557985632186289', '11/25', '456'),
+('4557512368954257', '10/27', '789'),
+('4557782165439758', '09/28', '321'),
+('4557974125689523', '08/30', '654');
 
 
 SELECT * FROM usuarios;

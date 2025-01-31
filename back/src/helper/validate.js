@@ -63,7 +63,13 @@ const validate = async (validation = [], req) => {
                 if (fieldValue) {
 
                     // Validar tipo de datos (por ejemplo: string, number, etc.)
-                    if (item.type != 'file' && item.type && typeof fieldValue !== item.type) {
+                    if (item.type === 'date') {
+                        const isValidDate = !isNaN(Date.parse(fieldValue));
+                        if (!isValidDate) {
+                            errors.hasErrors = true;
+                            errors.errors.push({ message: `${item.field} debe ser una fecha válida.` });
+                        }
+                    } else if (item.type && item.type !== 'file' && typeof fieldValue !== item.type) {
                         errors.hasErrors = true;
                         errors.errors.push({ message: `${item.field} debe ser un ${item.type}.` });
                         continue;

@@ -11,16 +11,16 @@ const auth = require('../../auth/auth');
 const get = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
-        if(tokenAccess.error){
-            res.json(respuesta.error(req, res, tokenAccess.message, 401));
+        if (tokenAccess.error) {
+            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
             return;
         }
-        
+
         const items = await bd.query(`SELECT * FROM ${TABLA}`, []);
         res.json(respuesta.success(req, res, items, 200));
     } catch (err) {
         console.log(err);
-        res.json(respuesta.error(req, res, 'Error al obtener los usuarios', 500));
+        res.json(respuesta.error(req, res, {message: 'Error al obtener los usuarios'}, 500));
     }
 }
 
@@ -64,13 +64,13 @@ const register = async (req, res) => {
         const token = jwt.sign({
             user_id: user.insertId,
             user_role: 2,
-            exp: Date.now() * 60 * 1000, 
+            exp: Date.now() * 60 * 1000,
             expires: false // no expirará
         }, config.jwt.secret);
 
-        res.json(respuesta.success(req, res, {message: 'Usuario creado', token}, 200));
+        res.json(respuesta.success(req, res, { message: 'Usuario creado', token }, 200));
     } catch (err) {
-        res.json(respuesta.error(req, res, 'Error al guardar al usuario', 500));
+        res.json(respuesta.error(req, res, {message: 'Error al guardar al usuario'}, 500));
     }
 }
 
@@ -78,13 +78,13 @@ const update = async (req, res) => {
     try {
         // verificar token, un usuario solo puede editar su propio perfil
         const payload = jwtHelper.getTokenPayload(req);
-        if(payload.error){
-            res.json(respuesta.error(req, res, payload.message, 401));
+        if (payload.error) {
+            res.json(respuesta.error(req, res, {message: payload.message}, 401));
             return;
         }
-        if(payload.payload.user_role != 1){
-            if(payload.payload.user_id != req.params.id){
-                res.json(respuesta.error(req, res, 'No tienes permisos para editar este perfil', 401));
+        if (payload.payload.user_role != 1) {
+            if (payload.payload.user_id != req.params.id) {
+                res.json(respuesta.error(req, res, {message: 'No tienes permisos para editar este perfil'}, 401));
                 return;
             }
         }
@@ -130,24 +130,24 @@ const update = async (req, res) => {
             return;
         }
 
-        if(req.body.password){
+        if (req.body.password) {
             const encryptedPassword = await bcrypt.hash(req.body.password, 10);
             req.body.password = encryptedPassword;
         }
 
         await bd.query(`UPDATE ${TABLA} SET ? WHERE id = ?`, [req.body, req.params.id]);
-        res.json(respuesta.success(req, res, 'Usuario actualizado', 200));
+        res.json(respuesta.success(req, res, {message: 'Usuario actualizado'}, 200));
     } catch (err) {
         console.log(err);
-        res.json(respuesta.error(req, res, 'Error al actualizar el usuario', 500));
+        res.json(respuesta.error(req, res, {message: 'Error al actualizar el usuario'}, 500));
     }
 }
 
 const toggleState = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
-        if(tokenAccess.error){
-            res.json(respuesta.error(req, res, tokenAccess.message, 401));
+        if (tokenAccess.error) {
+            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
             return;
         }
 
@@ -169,17 +169,17 @@ const toggleState = async (req, res) => {
         currentState = currentState[0].estado;
         const newState = currentState == 1 ? 0 : 1;
         await bd.query(`UPDATE ${TABLA} SET estado = ? WHERE id = ?`, [newState, req.params.id]);
-        res.json(respuesta.success(req, res, 'Estado actualizado', 200));
+        res.json(respuesta.success(req, res, {message: 'Estado actualizado'}, 200));
     } catch (Error) {
-        res.json(respuesta.error(req, res, 'Error al cambiar el estado', 500));
+        res.json(respuesta.error(req, res, {message: 'Error al cambiar el estado'}, 500));
     }
 }
 
 const store = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
-        if(tokenAccess.error){
-            res.json(respuesta.error(req, res, tokenAccess.message, 401));
+        if (tokenAccess.error) {
+            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
             return;
         }
 
@@ -223,9 +223,9 @@ const store = async (req, res) => {
         const encryptedPassword = await bcrypt.hash(req.body.password, 10);
         req.body.password = encryptedPassword;
         await bd.query(`INSERT INTO ${TABLA} set ?`, [req.body]);
-        res.json(respuesta.success(req, res, 'Usuario creado', 200));
+        res.json(respuesta.success(req, res, {message: 'Usuario creado'}, 200));
     } catch (err) {
-        res.json(respuesta.error(req, res, 'Error al guardar al usuario', 500));
+        res.json(respuesta.error(req, res, {message: 'Error al guardar al usuario'}, 500));
     }
 }
 
@@ -249,13 +249,13 @@ const login = async (req, res) => {
             return;
         }
 
-        let user = await bd.query(`SELECT * FROM ${TABLA} WHERE email = ?`, [req.body.email]);
+        let user = await bd.query(`SELECT * FROM ${TABLA} WHERE email = ? AND estado = 1`, [req.body.email]);
         console.log(user.length);
-        if(user.length > 0 ){
+        if (user.length > 0) {
             user = user[0];
             bcrypt.compare(req.body.password, user.password, (err, result) => {
                 if (err) {
-                    res.json(respuesta.error(req, res, 'email o contraseña incorrectos', 401));
+                    res.json(respuesta.error(req, res, {message: 'email o contraseña incorrectos'}, 401));
                 }
                 if (result) {
                     const token = jwt.sign({
@@ -264,16 +264,16 @@ const login = async (req, res) => {
                         exp: Date.now() + 60 * 1000,
                         expires: false
                     }, config.jwt.secret);
-                    res.json(respuesta.success(req, res, {message: "logueado exitosamente", token}, 200))
+                    res.json(respuesta.success(req, res, { message: "logueado exitosamente", token }, 200))
                 } else {
-                    res.json(respuesta.error(req, res, 'email o contraseña incorrectos', 401));
+                    res.json(respuesta.error(req, res, {message: 'email o contraseña incorrectos'}, 401));
                 }
             });
-        } else{
-            res.json(respuesta.error(req, res, 'email o contraseña incorrectos', 401));
+        } else {
+            res.json(respuesta.error(req, res, {message: 'email o contraseña incorrectos'}, 401));
         }
     } catch (err) {
-        res.json(respuesta.error(req, res, 'Error al loguear', 500));
+        res.json(respuesta.error(req, res, {message: 'Error al loguear'}, 500));
     }
 }
 
