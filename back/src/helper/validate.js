@@ -19,22 +19,22 @@ const validate = async (validation = [], req) => {
                 // Validar si el campo es requerido
                 if (item.type != "file" && item.required && (!fieldValue || fieldValue === null || fieldValue === undefined)) {
                     errors.hasErrors = true;
-                    errors.errors.push({message: `${item.field} es obligatorio.`});
+                    errors.errors.push({ message: `${item.field} es obligatorio.` });
                     continue;
                 }
 
                 // Validar tipo de archivo
                 if (item.type === "file") {
                     let files = req.files && req.files[item.field] ? req.files[item.field] : [];; // Inicializamos el array de archivos
-                    
+
                     if (item.required && files.length === 0) {
                         errors.hasErrors = true;
-                        errors.errors.push({message: `${item.field} es obligatorio.`});
+                        errors.errors.push({ message: `${item.field} es obligatorio.` });
                         continue;
                     }
-                    if(files.length > item.maxCount){
+                    if (files.length > item.maxCount) {
                         errors.hasErrors = true;
-                        errors.errors.push({message: `${item.field} debe tener como máximo ${item.maxCount} archivo${item.maxCount == 1 ? '' : 's'}.`});
+                        errors.errors.push({ message: `${item.field} debe tener como máximo ${item.maxCount} archivo${item.maxCount == 1 ? '' : 's'}.` });
                         continue;
                     }
 
@@ -46,73 +46,75 @@ const validate = async (validation = [], req) => {
                                 if (item.allowedExtensions && !item.allowedExtensions.includes(fileExtension)) {
                                     errors.hasErrors = true;
                                     errors.errors.push(
-                                        {message: `${file.originalname} tiene una extensión no permitida (${fileExtension}). Extensiones permitidas: ${item.allowedExtensions.join(", ")}.`}
+                                        { message: `${file.originalname} tiene una extensión no permitida (${fileExtension}). Extensiones permitidas: ${item.allowedExtensions.join(", ")}.` }
                                     );
                                 }
-                
+
                                 // Validar tamaño máximo del archivo
                                 if (item.maxSize && file.size > item.maxSize) {
                                     errors.hasErrors = true;
-                                    errors.errors.push({message: `${file.originalname} excede el tamaño máximo permitido (${item.maxSize} bytes).`});
+                                    errors.errors.push({ message: `${file.originalname} excede el tamaño máximo permitido (${item.maxSize} bytes).` });
                                 }
                             }
                         }
                     }
                 }
-                
 
-                // Validar tipo de datos (por ejemplo: string, number, etc.)
-                if (item.type != 'file' && item.type && typeof fieldValue !== item.type) {
-                    errors.hasErrors = true;
-                    errors.errors.push({message: `${item.field} debe ser un ${item.type}.`});
-                    continue;
-                }
+                if (fieldValue) {
 
-                // Validar longitud mínima y máxima (para strings)
-                if (item.min && fieldValue.length < item.min) {
-                    errors.hasErrors = true;
-                    errors.errors.push({message: `${item.field} debe tener al menos ${item.min} caracteres.`});
-                }
-                if (item.max && fieldValue.length > item.max) {
-                    errors.hasErrors = true;
-                    errors.errors.push({message: `${item.field} no puede tener más de ${item.max} caracteres.`});
-                }
-
-                // Validar valores únicos en base de datos
-                if (item.unique) {
-                    const exists = await db.query(`SELECT * FROM ${item.table} WHERE ${item.field} = ?`, [fieldValue]);
-                    const maxLength = item.updating ? 1 : 0;
-                    if (exists.length > maxLength) {
+                    // Validar tipo de datos (por ejemplo: string, number, etc.)
+                    if (item.type != 'file' && item.type && typeof fieldValue !== item.type) {
                         errors.hasErrors = true;
-                        errors.errors.push({message: `${item.field} debe ser único.`});
-                    }
-                }
-
-                // Validar si el valor debe existir en la base de datos
-                if (item.mustExist) {
-                    const field = item.foreignField ? item.foreignField : item.field;
-                    const exists = await db.query(`SELECT * FROM ${item.table} WHERE ${field} = ?`, [fieldValue]);
-                    if (exists.length < 1) {
-                        errors.hasErrors = true;
-                        errors.errors.push({message: `No existe ${item.field} con el valor ${fieldValue}.`});
-                    }
-                }
-
-                // Validar valores numéricos
-                if (item.type === "number") {
-                    if (isNaN(fieldValue)) {
-                        errors.hasErrors = true;
-                        errors.errors.push({message: `${item.field} debe ser un número.`});
+                        errors.errors.push({ message: `${item.field} debe ser un ${item.type}.` });
+                        continue;
                     }
 
-                    if (item.min && fieldValue < item.min) {
+                    // Validar longitud mínima y máxima (para strings)
+                    if (item.min && fieldValue.length < item.min) {
                         errors.hasErrors = true;
-                        errors.errors.push({message: `${item.field} debe ser igual o mayor que ${item.min}.`});
+                        errors.errors.push({ message: `${item.field} debe tener al menos ${item.min} caracteres.` });
+                    }
+                    if (item.max && fieldValue.length > item.max) {
+                        errors.hasErrors = true;
+                        errors.errors.push({ message: `${item.field} no puede tener más de ${item.max} caracteres.` });
                     }
 
-                    if (item.max && fieldValue > item.max) {
-                        errors.hasErrors = true;
-                        errors.errors.push({message: `${item.field} debe ser igual o menor que ${item.max}.`});
+                    // Validar valores únicos en base de datos
+                    if (item.unique) {
+                        const exists = await db.query(`SELECT * FROM ${item.table} WHERE ${item.field} = ?`, [fieldValue]);
+                        const maxLength = item.updating ? 1 : 0;
+                        if (exists.length > maxLength) {
+                            errors.hasErrors = true;
+                            errors.errors.push({ message: `${item.field} debe ser único.` });
+                        }
+                    }
+
+                    // Validar si el valor debe existir en la base de datos
+                    if (item.mustExist) {
+                        const field = item.foreignField ? item.foreignField : item.field;
+                        const exists = await db.query(`SELECT * FROM ${item.table} WHERE ${field} = ?`, [fieldValue]);
+                        if (exists.length < 1) {
+                            errors.hasErrors = true;
+                            errors.errors.push({ message: `No existe ${item.field} con el valor ${fieldValue}.` });
+                        }
+                    }
+
+                    // Validar valores numéricos
+                    if (item.type === "number") {
+                        if (isNaN(fieldValue)) {
+                            errors.hasErrors = true;
+                            errors.errors.push({ message: `${item.field} debe ser un número.` });
+                        }
+
+                        if (item.min && fieldValue < item.min) {
+                            errors.hasErrors = true;
+                            errors.errors.push({ message: `${item.field} debe ser igual o mayor que ${item.min}.` });
+                        }
+
+                        if (item.max && fieldValue > item.max) {
+                            errors.hasErrors = true;
+                            errors.errors.push({ message: `${item.field} debe ser igual o menor que ${item.max}.` });
+                        }
                     }
                 }
             }
@@ -120,7 +122,7 @@ const validate = async (validation = [], req) => {
     } catch (err) {
         console.error("Error al validar los campos:", err);
         errors.hasErrors = true;
-        errors.errors.push({message: "Error en la validación.", error: err});
+        errors.errors.push({ message: "Error en la validación.", error: err });
     }
 
     return errors;

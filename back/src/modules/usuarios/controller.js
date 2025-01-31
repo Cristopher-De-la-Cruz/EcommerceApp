@@ -76,6 +76,18 @@ const register = async (req, res) => {
 
 const update = async (req, res) => {
     try {
+        // verificar token, un usuario solo puede editar su propio perfil
+        const payload = jwtHelper.getTokenPayload(req);
+        if(payload.error){
+            res.json(respuesta.error(req, res, payload.message, 401));
+            return;
+        }
+        if(payload.payload.user_role != 1){
+            if(payload.payload.user_id != req.params.id){
+                res.json(respuesta.error(req, res, 'No tienes permisos para editar este perfil', 401));
+                return;
+            }
+        }
         const errors = await validate([
             {
                 field: 'nombre',
@@ -118,19 +130,6 @@ const update = async (req, res) => {
             return;
         }
 
-        // verificar token, un usuario solo puede editar su propio perfil
-        const payload = jwtHelper.getTokenPayload(req);
-        if(payload.error){
-            res.json(respuesta.error(req, res, payload.message, 401));
-            return;
-        }
-        if(payload.payload.user_role != 1){
-            if(payload.payload.user_id != req.params.id){
-                res.json(respuesta.error(req, res, 'No tienes permisos para editar este perfil', 401));
-                return;
-            }
-        }
-
         if(req.body.password){
             const encryptedPassword = await bcrypt.hash(req.body.password, 10);
             req.body.password = encryptedPassword;
@@ -139,6 +138,7 @@ const update = async (req, res) => {
         await bd.query(`UPDATE ${TABLA} SET ? WHERE id = ?`, [req.body, req.params.id]);
         res.json(respuesta.success(req, res, 'Usuario actualizado', 200));
     } catch (err) {
+        console.log(err);
         res.json(respuesta.error(req, res, 'Error al actualizar el usuario', 500));
     }
 }
