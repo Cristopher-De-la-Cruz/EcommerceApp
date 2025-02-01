@@ -1,16 +1,15 @@
-import { useContext } from 'react'
-import { ThemeContext } from './context/ThemeContext'
-function App() {
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { Login } from "./pages/login"
+import { NoPage } from "./pages/NoPage"
 
-  const { toggleTheme } = useContext(ThemeContext)
-
+export const App = () => {
   return (
-    <>
-      <div className="bg-gray-200 dark:bg-gray-800 dark:text-white h-screen w-full overflow-auto flex justify-center items-center">
-          <button className='bg-zinc-500 hover:bg-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-white font-bold py-2 px-4 rounded-full' onClick={toggleTheme}>Toggle Theme</button>
-      </div>
-    </>
+    <BrowserRouter>
+        <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="*" element={<NoPage />} />
+        </Routes>
+    </BrowserRouter>
   )
 }
 
-export default App
