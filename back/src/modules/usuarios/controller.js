@@ -47,7 +47,7 @@ const register = async (req, res) => {
                 field: 'password',
                 type: 'string',
                 required: true,
-                min: 5,
+                min: 8,
                 max: 30,
             }
         ], req);
@@ -68,7 +68,7 @@ const register = async (req, res) => {
             expires: false // no expirará
         }, config.jwt.secret);
 
-        res.json(respuesta.success(req, res, { message: 'Usuario creado', token }, 200));
+        res.json(respuesta.success(req, res, { message: 'Usuario creado', token, user:{nombre: req.body.nombre, email: req.body.email, role: 2} }, 200));
     } catch (err) {
         res.json(respuesta.error(req, res, {message: 'Error al guardar al usuario'}, 500));
     }
@@ -236,11 +236,15 @@ const login = async (req, res) => {
                 field: 'email',
                 type: 'string',
                 required: true,
+                min: 5,
+                max: 200,
             },
             {
                 field: 'password',
                 type: 'string',
                 required: true,
+                min: 8,
+                max: 30
             },
         ], req);
 
@@ -264,7 +268,7 @@ const login = async (req, res) => {
                         exp: Date.now() + 60 * 1000,
                         expires: false
                     }, config.jwt.secret);
-                    res.json(respuesta.success(req, res, { message: "logueado exitosamente", token }, 200))
+                    res.json(respuesta.success(req, res, { message: "logueado exitosamente", token, user }, 200))
                 } else {
                     res.json(respuesta.error(req, res, {message: 'email o contraseña incorrectos'}, 401));
                 }

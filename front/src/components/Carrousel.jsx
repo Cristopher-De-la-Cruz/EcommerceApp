@@ -18,7 +18,7 @@ export const Carrousel = ({ slides }) => {
     return (
         <div className="relative w-full h-full max-w-2xl mx-auto">
             {/* Slides */}
-            <div className="overflow-hidden rounded-lg">
+            <div className="relative overflow-hidden rounded-lg">
                 <div
                     className="flex transition-transform duration-500"
                     style={{ transform: `translateX(-${currentSlide * 100}%)` }}
@@ -36,21 +36,20 @@ export const Carrousel = ({ slides }) => {
                         </div>
                     ))}
                 </div>
+                {/* Controls */}
+                <button
+                    onClick={handlePrev}
+                    className="absolute top-1/2 left-0 transform -translate-y-1/2 text-black hover:text-white cursor-pointer text-2xl p-2 rounded-full shadow-md focus:outline-none"
+                >
+                    <FontAwesomeIcon icon={faArrowLeft} />
+                </button>
+                <button
+                    onClick={handleNext}
+                    className="absolute top-1/2 right-0 transform -translate-y-1/2 text-black hover:text-white cursor-pointer text-2xl p-2 rounded-full shadow-md focus:outline-none"
+                >
+                    <FontAwesomeIcon icon={faArrowRight} />
+                </button>
             </div>
-
-            {/* Controls */}
-            <button
-                onClick={handlePrev}
-                className="absolute top-1/2 left-0 transform -translate-y-1/2 text-black hover:text-white cursor-pointer text-2xl p-2 rounded-full shadow-md focus:outline-none"
-            >
-                <FontAwesomeIcon icon={faArrowLeft} />
-            </button>
-            <button
-                onClick={handleNext}
-                className="absolute top-1/2 right-0 transform -translate-y-1/2 text-black hover:text-white cursor-pointer text-2xl p-2 rounded-full shadow-md focus:outline-none"
-            >
-                <FontAwesomeIcon icon={faArrowRight} />
-            </button>
 
             {/* Indicators */}
             <div className="flex justify-center gap-2 mt-4">
@@ -58,9 +57,9 @@ export const Carrousel = ({ slides }) => {
                     <button
                         key={index}
                         onClick={() => setCurrentSlide(index)}
-                        className={`w-3 h-3 rounded-full ${index === currentSlide
-                                ? 'bg-gray-800'
-                                : 'bg-gray-400 hover:bg-gray-600'
+                        className={`w-3 h-3 border border-white rounded-full ${index === currentSlide
+                            ? 'bg-gray-800'
+                            : 'bg-gray-400 hover:bg-gray-600'
                             }`}
                     ></button>
                 ))}

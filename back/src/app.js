@@ -2,12 +2,20 @@ const express = require('express')
 const config = require('./config')
 const path = require('path')
 const app = express()
+const cors = require('cors');
 
 //configuracion
 app.set('port', config.app.port);
 
 //Middleware
 app.use(express.json()); // para parsear el req.body
+
+// Cors
+app.use(cors({
+    origin: config.app.front_host,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Servir archivos estáticos desde el directorio uploads
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));

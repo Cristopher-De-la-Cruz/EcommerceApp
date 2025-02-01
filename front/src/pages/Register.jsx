@@ -4,8 +4,9 @@ import { AuthContext } from '../context/Auth/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons'
 import { Carrousel } from '../components/Carrousel'
-import { LoginCard } from '../components/login/LoginCard'
+import { RegisterCard } from '../components/register/RegisterCard';
 import { useNavigate } from 'react-router-dom';
+
 
 const slides = [
     {
@@ -25,7 +26,7 @@ const slides = [
     },
 ];
 
-export const Login = () => {
+export const Register = () => {
     const { toggleTheme, theme } = useContext(ThemeContext)
     const { isLogged } = useContext(AuthContext)
     const navigate = useNavigate();
@@ -37,10 +38,11 @@ export const Login = () => {
 
     return (
         <>
-            <div className="h-screen bg-slate-100 dark:bg-zinc-900 w-full overflow-auto flex dark:text-white">
+            <div className="h-screen w-full overflow-auto flex dark:text-white">
+                
                 <div className="duration-400 w-3/5 h-full bg-slate-100 dark:bg-zinc-900 flex justify-center items-center">
                     {/* Login Card */}
-                    <LoginCard/>
+                    <RegisterCard/>
                 </div>
                 <div className="duration-400 w-2/5 h-full bg-red-100 dark:bg-zinc-950 flex flex-col justify-center gap-10 py-15">
                     <div className='text-center'>

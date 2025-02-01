@@ -9,7 +9,7 @@ export const ThemeProvider = ({ children }) => {
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
-    Cookies.set('theme', newTheme, {expires: 1/48}); // Se borrará la cookie en media hora 48 partes de un día (24 horas)
+    Cookies.set('theme', newTheme /*, {expires: 1/48}*/); // Se borrará la cookie en media hora 48 partes de un día (24 horas)
   };
 
   return (

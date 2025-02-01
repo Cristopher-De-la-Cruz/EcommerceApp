@@ -1,28 +1,28 @@
 import { useContext } from 'react'
-import { ThemeContext } from '../context/ThemeContext'
+import { ThemeContext } from '../context/Theme/ThemeContext'
+import { AuthContext } from '../context/Auth/AuthContext';
 import {Carrousel} from '../components/Carrousel'
-
+const slides = [
+  {
+      id: 1,
+      image: 'https://www.esic.edu/sites/default/files/rethink/ba73d6a3-ecommerce.jpg',
+      title: 'Ecommerce App',
+  },
+  {
+      id: 2,
+      image: 'https://d1ih8jugeo2m5m.cloudfront.net/2022/07/el-ecommerce-que-es.jpg',
+      title: 'El ecommerce que es',
+  },
+  {
+      id: 3,
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxfbHqRcIJyfetk-m8WL-ImiUPITWjcB9rhw&s',
+      title: 'Al alcance de un click',
+  },
+];
 export const NoPage = () => {
     const { toggleTheme } = useContext(ThemeContext)
-    const slides = [
-        {
-          id: 1,
-          image: 'https://via.placeholder.com/600x300?text=Slide+1',
-          title: 'Slide 1',
-          description: 'Descripción de la diapositiva 1',
-        },
-        {
-          id: 2,
-          image: 'https://via.placeholder.com/600x300?text=Slide+2',
-          title: 'Slide 2',
-          description: 'Descripción de la diapositiva 2',
-        },
-        {
-          id: 3,
-          image: 'https://via.placeholder.com/600x300?text=Slide+3',
-          description: 'Descripción de la diapositiva 3',
-        },
-      ];
+    const { user } = useContext(AuthContext)
+    console.log(user);
 
     return (
         <div className="bg-gray-300 duration-500 dark:bg-gray-950 dark:text-white h-screen w-full overflow-auto flex flex-col gap-5 justify-center items-center">
