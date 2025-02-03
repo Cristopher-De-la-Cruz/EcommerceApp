@@ -19,7 +19,7 @@ const get = async (req, res) => {
         const items = await bd.query(`SELECT * FROM ${TABLA}`, []);
         res.json(respuesta.success(req, res, items, 200));
     } catch (err) {
-        console.log(err);
+        console.error(err);
         res.json(respuesta.error(req, res, {message: 'Error al obtener los usuarios'}, 500));
     }
 }
@@ -60,7 +60,6 @@ const register = async (req, res) => {
         const encryptedPassword = await bcrypt.hash(req.body.password, 10);
         req.body.password = encryptedPassword;
         const user = await bd.query(`INSERT INTO ${TABLA} (nombre, email, password) VALUES (?, ?, ?)`, [req.body.nombre, req.body.email, req.body.password]);
-        console.log(user.insertId);
         const token = jwt.sign({
             user_id: user.insertId,
             user_role: 2,
@@ -138,7 +137,7 @@ const update = async (req, res) => {
         await bd.query(`UPDATE ${TABLA} SET ? WHERE id = ?`, [req.body, req.params.id]);
         res.json(respuesta.success(req, res, {message: 'Usuario actualizado'}, 200));
     } catch (err) {
-        console.log(err);
+        console.error(err);
         res.json(respuesta.error(req, res, {message: 'Error al actualizar el usuario'}, 500));
     }
 }
@@ -254,7 +253,6 @@ const login = async (req, res) => {
         }
 
         let user = await bd.query(`SELECT * FROM ${TABLA} WHERE email = ? AND estado = 1`, [req.body.email]);
-        console.log(user.length);
         if (user.length > 0) {
             user = user[0];
             bcrypt.compare(req.body.password, user.password, (err, result) => {

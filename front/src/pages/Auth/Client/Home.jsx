@@ -1,23 +1,10 @@
-import { useContext, useEffect } from 'react'
-import { AuthContext } from '../../../context/Auth/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Layout } from '../../../components/auth/client/Layout'
 
 export const Home = () => {
-    const { isLogged, logout } = useContext(AuthContext)
-    const navigate = useNavigate();
-    useEffect(() => {
-        if (!isLogged) {
-            navigate('/login')
-        }
-    }, [isLogged, navigate])
+
     return (
-        <>
-            {
-                isLogged && <div>
-                    <div>home</div>
-                    <button onClick={logout}>Logout</button>
-                </div>
-            }
-        </>
+        <Layout title="Home">
+            <div>home</div>
+        </Layout>
     )
 }

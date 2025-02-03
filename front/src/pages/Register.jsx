@@ -1,11 +1,10 @@
 import { useContext, useEffect } from 'react'
-import { ThemeContext } from '../context/Theme/ThemeContext'
 import { AuthContext } from '../context/Auth/AuthContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons'
 import { Carrousel } from '../components/Carrousel'
 import { RegisterCard } from '../components/register/RegisterCard';
 import { useNavigate } from 'react-router-dom';
+import { ThemeButton } from '../components/ThemeButton';
+import bcrypt from 'bcryptjs'
 
 
 const slides = [
@@ -27,40 +26,45 @@ const slides = [
 ];
 
 export const Register = () => {
-    const { toggleTheme, theme } = useContext(ThemeContext)
-    const { isLogged } = useContext(AuthContext)
+    const { isLogged, user } = useContext(AuthContext)
     const navigate = useNavigate();
     useEffect(() => {
-        if(isLogged){
-            navigate('/')
+        if (isLogged) {
+            const role = bcrypt.compareSync('1', `${user.role}`);
+            const route = role ? '/admin' : '/';
+            navigate(route)
+        } else {
+            document.title = 'Register';
         }
-    }, [isLogged, navigate])
+    }, [isLogged, navigate, user])
+
 
     return (
         <>
-            <div className="h-screen w-full overflow-auto flex dark:text-white">
-                
-                <div className="duration-400 w-3/5 h-full bg-slate-100 dark:bg-zinc-900 flex justify-center items-center">
-                    {/* Login Card */}
-                    <RegisterCard/>
-                </div>
-                <div className="duration-400 w-2/5 h-full bg-red-100 dark:bg-zinc-950 flex flex-col justify-center gap-10 py-15">
-                    <div className='text-center'>
-                        <h1 className='text-5xl font-bold'>Ecommerce App</h1>
-                        <p className='text-sm'>Comercio electrónico al alcance de todos</p>
-                    </div>
-                    {/* Carrousel */}
-                    <div className='w-full flex justify-center items-center'>
-                        <div className='w-5/6'>
-                            <Carrousel slides={slides} />
+            {
+                !isLogged && <>
+                    <div className="h-screen w-full overflow-auto flex dark:text-white">
+
+                        <div className="duration-400 w-3/5 h-full bg-slate-100 dark:bg-zinc-900 flex justify-center items-center">
+                            <RegisterCard />
+                        </div>
+                        <div className="duration-400 w-2/5 h-full bg-red-100 dark:bg-zinc-950 flex flex-col justify-center gap-10 py-15">
+                            <div className='text-center'>
+                                <h1 className='text-5xl font-bold'>Ecommerce App</h1>
+                                <p className='text-sm'>Comercio electrónico al alcance de todos</p>
+                            </div>
+                            {/* Carrousel */}
+                            <div className='w-full flex justify-center items-center'>
+                                <div className='w-5/6'>
+                                    <Carrousel slides={slides} />
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            {/* Absolute */}
-            <button className="absolute top-3 left-5 text-black" onClick={toggleTheme}>
-                <FontAwesomeIcon className={`duration-400 ${theme == 'dark' ? 'text-white' : 'text-black'} text-3xl cursor-pointer`} icon={theme == 'dark' ? faSun : faMoon} />
-            </button>
+                    <ThemeButton />
+                </>
+            }
+
         </>
     )
 }

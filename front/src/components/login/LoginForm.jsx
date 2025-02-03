@@ -4,7 +4,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useContext } from "react";
 import { ThemeContext } from "../../context/Theme/ThemeContext";
 import { AuthContext } from "../../context/Auth/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { InputPassword } from "../InputPassword";
 import apiRoutes from '../../services/apiRoutes';
 
@@ -14,10 +13,9 @@ const initForm = {
 }
 export const LoginForm = () => {
     const { fetchApi } = useApi();
-    const { form, changeForm, resetForm } = useForm(initForm);
+    const { form, changeForm } = useForm(initForm);
     const { theme } = useContext(ThemeContext);
     const { login } = useContext(AuthContext);
-    const navigate = useNavigate();
 
     const handleSubmit = async () => {
         try {
@@ -39,10 +37,9 @@ export const LoginForm = () => {
                 toast.success(data.body.message, { position: "bottom-right", theme: theme });
                 const logged = login({ nombre: data.body.user.nombre, email: data.body.user.email, role: data.body.user.role }, data.body.token);
                 console.log(logged);
-                if (logged.success) {
-                    resetForm();
-                    navigate('/')
-                } else {
+                const route = data.body.user.role == 1 ? '/admin' : '/';
+                console.log(route);
+                if (!logged.success) {
                     toast.error('Ha ocurrido un error.', { position: "bottom-right", theme: theme });
                     return;
                 }

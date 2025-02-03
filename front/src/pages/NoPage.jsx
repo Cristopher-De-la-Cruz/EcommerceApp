@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { ThemeContext } from '../context/Theme/ThemeContext'
 import { AuthContext } from '../context/Auth/AuthContext';
 import {Carrousel} from '../components/Carrousel'
@@ -23,6 +23,10 @@ export const NoPage = () => {
     const { toggleTheme } = useContext(ThemeContext)
     const { user } = useContext(AuthContext)
     console.log(user);
+
+    useEffect(() => {
+        document.title = 'Not Found';
+    }, [])
 
     return (
         <div className="bg-gray-300 duration-500 dark:bg-gray-950 dark:text-white h-screen w-full overflow-auto flex flex-col gap-5 justify-center items-center">

@@ -2,6 +2,8 @@ import { AuthContext } from "./AuthContext";
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Cookies from 'js-cookie';
+import bcrypt from 'bcryptjs'
+
 
 const initUser = {
     nombre: '',
@@ -26,6 +28,8 @@ export const AuthProvider = ({ children }) => {
             if (!newToken) {
                 return { success: false, message: 'Ingrese token', status: 400 };
             }
+            const encryptedRole = bcrypt.hashSync(`${newUser.role}`, 10);
+            newUser.role = encryptedRole;
             setIsLogged(true);
             Cookies.set('isLogged', true);
             setUser(newUser);
