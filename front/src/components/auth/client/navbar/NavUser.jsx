@@ -15,7 +15,7 @@ export const NavUser = () => {
 
     return (
         <>
-            <RenderWithAnimation contClass="absolute  text-white dark:text-black right-2 top-10 transition-all ease-out transform"
+            <RenderWithAnimation contClass="absolute text-white dark:text-black right-2 top-10 transition-all ease-out transform"
                 renderAnimationClass="opacity-100 translate-y-0 scale-100"
                 exitAnimationClass="opacity-0 -translate-y-5 scale-95"
                 buttonChildren={
@@ -33,7 +33,7 @@ export const NavUser = () => {
                     <div className="flex justify-end w-full h-3 relative">
                         {/* Forma triangular */}
                         <div
-                            className="absolute right-4 bottom-0"
+                            className="duration-400 absolute right-4 bottom-0"
                             style={{
                                 width: 0,
                                 height: 0,

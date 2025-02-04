@@ -11,40 +11,80 @@ const get = async (req, res) => {
     try {
         const token = jwtHelper.getTokenPayload(req);
         if (token.error) {
-            res.json(respuesta.error(req, res, { message: token.message }, 401));
+            respuesta.error(req, res, { message: token.message }, 401);
             return;
         }
-        const items = await bd.query(
-            `SELECT u.*, c.nombre AS categoria
-            FROM ${TABLA} AS u
-            JOIN categorias AS c ON u.categoria_id = c.id;`, []);
 
+        // Parámetros opcionales desde req.query
+        const {  estado = 1, precioDesde, precioHasta, categoria, pagina = 1, limite = 10 } = req.query;
+
+        // Base de la consulta
+        let query = `
+            SELECT u.*, c.nombre AS categoria
+            FROM ${TABLA} AS u
+            JOIN categorias AS c ON u.categoria_id = c.id
+            WHERE 1=1
+        `;
+        const params = [];
+
+        // Agregar filtros dinámicamente
+        if (estado) {
+            query += ' AND u.estado = ?';
+            params.push(estado);
+        }
+        if (precioDesde) {
+            query += ' AND u.precio >= ?';
+            params.push(precioDesde);
+        }
+        if (precioHasta) {
+            query += ' AND u.precio <= ?';
+            params.push(precioHasta);
+        }
+        if (categoria) {
+            query += ' AND c.id = ?';
+            params.push(categoria);
+        }
+
+        const queryNoLimit = query;
+        const paramsNoLimit = [...params];
+
+        // Agregar paginación
+        const offset = (pagina - 1) * limite;
+        query += ' LIMIT ? OFFSET ?';
+        params.push(parseInt(limite), parseInt(offset));
+
+        // Ejecutar consulta
+        const items = await bd.query(query, params);
+
+        // Procesar imágenes de cada producto
         const productos = await Promise.all(
             items.map(async (item) => {
                 let imagenes = await bd.query(
                     `SELECT * FROM imagenes_producto WHERE producto_id = ? AND estado = 1`,
                     [item.id]
                 );
-                imagenes = imagenes.map(imagen => {
-                    return { ...imagen, imagen: `${config.app.host}${imagen.imagen}` };
-                });
+                imagenes = imagenes.map(imagen => ({
+                    ...imagen,
+                    imagen: `${config.app.host}${imagen.imagen}`
+                }));
                 return { ...item, imagenes };
             })
         );
+        const productsNoLimit = await bd.query(queryNoLimit, paramsNoLimit);
 
-
-        res.json(respuesta.success(req, res, productos, 200));
+        respuesta.success(req, res, {productos, maxCount: productsNoLimit.length}, 200);
     } catch (err) {
-        res.json(respuesta.error(req, res, { message: 'Error al obtener los productos', error: err }, 500));
+        respuesta.error(req, res, { message: 'Error al obtener los productos', error: err }, 500);
     }
-}
+};
+
 
 const show = async (req, res) => {
     try {
         console.log(req.params['id']);
         const token = jwtHelper.getTokenPayload(req);
         if (token.error) {
-            res.json(respuesta.error(req, res, { message: token.message }, 401));
+            respuesta.error(req, res, { message: token.message }, 401);
             return;
         }
 
@@ -58,7 +98,7 @@ const show = async (req, res) => {
             }
         ], req);
         if (errors.hasErrors) {
-            res.json(respuesta.error(req, res, errors.errors, 400));
+            respuesta.error(req, res, errors.errors, 400);
             return;
         }
 
@@ -73,9 +113,9 @@ const show = async (req, res) => {
             return { ...imagen, imagen: `${config.app.host}${imagen.imagen}` };
         });
         producto.imagenes = imagenes;
-        res.json(respuesta.success(req, res, producto, 200));
+        respuesta.success(req, res, producto, 200);
     } catch (err) {
-        res.json(respuesta.error(req, res, { message: 'Error al obtener el producto', error: err }, 500));
+        respuesta.error(req, res, { message: 'Error al obtener el producto', error: err }, 500);
     }
 }
 
@@ -84,7 +124,7 @@ const showWithAllImages = async (req, res) => {
         console.log(req.params['id']);
         const token = jwtHelper.getTokenPayload(req);
         if (token.error) {
-            res.json(respuesta.error(req, res, { message: token.message }, 401));
+            respuesta.error(req, res, { message: token.message }, 401);
             return;
         }
 
@@ -98,7 +138,7 @@ const showWithAllImages = async (req, res) => {
             }
         ], req);
         if (errors.hasErrors) {
-            res.json(respuesta.error(req, res, errors.errors, 400));
+            respuesta.error(req, res, errors.errors, 400);
             return;
         }
 
@@ -113,9 +153,9 @@ const showWithAllImages = async (req, res) => {
             return { ...imagen, imagen: `${config.app.host}${imagen.imagen}` };
         });
         producto.imagenes = imagenes;
-        res.json(respuesta.success(req, res, producto, 200));
+        respuesta.success(req, res, producto, 200);
     } catch (err) {
-        res.json(respuesta.error(req, res, { message: 'Error al obtener el producto', error: err }, 500));
+        respuesta.error(req, res, { message: 'Error al obtener el producto', error: err }, 500);
     }
 }
 
@@ -123,7 +163,7 @@ const store = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
+            respuesta.error(req, res, { message: tokenAccess.message }, 401);
             return;
         }
 
@@ -174,7 +214,7 @@ const store = async (req, res) => {
                     deleteFile(thisFile.path);
                 });
             }
-            res.json(respuesta.error(req, res, errors.errors, 400));
+            respuesta.error(req, res, errors.errors, 400);
             return;
         }
 
@@ -184,7 +224,7 @@ const store = async (req, res) => {
                 req.files['imagen'].map(img => {
                     let productoResult = saveFile(img, 'images/productos');
                     if (!productoResult.success) {
-                        return res.json(respuesta.error(req, res, { message: productoResult.message, error: productoResult.error }, 400));
+                        return respuesta.error(req, res, { message: productoResult.message, error: productoResult.error }, 400);
                     }
                     imagenes.push(productoResult.newPath);
                 });
@@ -200,10 +240,11 @@ const store = async (req, res) => {
             await bd.query(`INSERT INTO imagenes_producto set ?`, [{ producto_id: producto.insertId }]);
         }
 
-        res.json(respuesta.success(req, res, { message: 'Producto creado' }, 200));
+        respuesta.success(req, res, { message: 'Producto creado' }, 200);
+        console.log('producto creado');
     } catch (err) {
         console.error('Error al guardar el producto:', err);
-        res.json(respuesta.error(req, res, { message: 'Error al guardar el producto', error: err }, 500));
+        respuesta.error(req, res, { message: 'Error al guardar el producto', error: err }, 500);
     }
 }
 
@@ -211,7 +252,7 @@ const update = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
+            respuesta.error(req, res, { message: tokenAccess.message }, 401);
             return;
         }
         const errors = await validate([
@@ -252,13 +293,13 @@ const update = async (req, res) => {
         ], req);
 
         if (errors.hasErrors) {
-            res.json(respuesta.error(req, res, errors.errors, 400));
+            respuesta.error(req, res, errors.errors, 400);
             return;
         }
         await bd.query(`UPDATE ${TABLA} SET ? WHERE id = ?`, [req.body, req.params.id]);
-        res.json(respuesta.success(req, res, { message: 'producto actualizado' }, 200));
+        respuesta.success(req, res, { message: 'producto actualizado' }, 200);
     } catch (err) {
-        res.json(respuesta.error(req, res, { message: 'Error al actualizar el producto' }, 500));
+        respuesta.error(req, res, { message: 'Error al actualizar el producto' }, 500);
     }
 }
 
@@ -266,7 +307,7 @@ const toggleState = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
+            respuesta.error(req, res, { message: tokenAccess.message }, 401);
             return;
         }
 
@@ -281,16 +322,16 @@ const toggleState = async (req, res) => {
         ], req);
 
         if (errors.hasErrors) {
-            res.json(respuesta.error(req, res, errors.errors, 400));
+            respuesta.error(req, res, errors.errors, 400);
             return;
         }
         let currentState = await bd.query(`SELECT estado FROM ${TABLA} WHERE id = ?`, [req.params.id]);
         currentState = currentState[0].estado;
         const newState = currentState == 1 ? 0 : 1;
         await bd.query(`UPDATE ${TABLA} SET estado = ? WHERE id = ?`, [newState, req.params.id]);
-        res.json(respuesta.success(req, res, { message: 'Estado actualizado' }, 200));
+        respuesta.success(req, res, { message: 'Estado actualizado' }, 200);
     } catch (Error) {
-        res.json(respuesta.error(req, res, { message: 'Error al cambiar el estado' }, 500));
+        respuesta.error(req, res, { message: 'Error al cambiar el estado' }, 500);
     }
 }
 
@@ -298,7 +339,7 @@ const inactiveImage = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
+            respuesta.error(req, res, { message: tokenAccess.message }, 401);
             return;
         }
 
@@ -313,7 +354,7 @@ const inactiveImage = async (req, res) => {
         ], req);
 
         if (errors.hasErrors) {
-            res.json(respuesta.error(req, res, errors.errors, 400));
+            respuesta.error(req, res, errors.errors, 400);
             return;
         }
         // verificar que el producto tenga mas de una imagen
@@ -322,14 +363,14 @@ const inactiveImage = async (req, res) => {
         const imagenes = await bd.query(`SELECT * FROM imagenes_producto WHERE producto_id = ? AND estado = 1`, [productoId]);
         console.log(imagenes.length);
         if (imagenes.length < 2) {
-            res.json(respuesta.error(req, res, { message: 'No se puede inactivar la única imagen' }, 400));
+            respuesta.error(req, res, { message: 'No se puede inactivar la única imagen' }, 400);
             return;
         }
 
         await bd.query(`UPDATE imagenes_producto SET estado = ? WHERE id = ? AND imagen != 'uploads/images/productos/default.png'`, [0, req.params.id]);
-        res.json(respuesta.success(req, res, { message: 'Imagen inactivada' }, 200));
+        respuesta.success(req, res, { message: 'Imagen inactivada' }, 200);
     } catch (err) {
-        res.json(respuesta.error(req, res, { message: 'Error al inactivar imagen', error: err }, 500));
+        respuesta.error(req, res, { message: 'Error al inactivar imagen', error: err }, 500);
     }
 }
 
@@ -337,7 +378,7 @@ const reactiveImage = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
+            respuesta.error(req, res, { message: tokenAccess.message }, 401);
             return;
         }
 
@@ -352,21 +393,21 @@ const reactiveImage = async (req, res) => {
         ], req);
 
         if (errors.hasErrors) {
-            res.json(respuesta.error(req, res, errors.errors, 400));
+            respuesta.error(req, res, errors.errors, 400);
             return;
         }
 
         // verificar que el producto tenga menos de 10 imagenes
         const imagenes = await bd.query(`SELECT * FROM imagenes_producto WHERE producto_id = ? AND estado = 1`, [req.params.id]);
         if (imagenes.length >= 10) {
-            res.json(respuesta.error(req, res, { message: 'No se puede tener más de 10 imágenes' }, 400));
+            respuesta.error(req, res, { message: 'No se puede tener más de 10 imágenes' }, 400);
             return;
         }
 
         await bd.query(`UPDATE imagenes_producto SET estado = ? WHERE id = ?`, [1, req.params.id]);
-        res.json(respuesta.success(req, res, { message: 'Imagen activada' }, 200));
+        respuesta.success(req, res, { message: 'Imagen activada' }, 200);
     } catch (err) {
-        res.json(respuesta.error(req, res, { message: 'Error al activar imagen', error: err }, 500));
+        respuesta.error(req, res, { message: 'Error al activar imagen', error: err }, 500);
     }
 }
 
@@ -374,7 +415,7 @@ const deleteImage = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
+            respuesta.error(req, res, { message: tokenAccess.message }, 401);
             return;
         }
 
@@ -389,7 +430,7 @@ const deleteImage = async (req, res) => {
         ], req);
 
         if (errors.hasErrors) {
-            res.json(respuesta.error(req, res, errors.errors, 400));
+            respuesta.error(req, res, errors.errors, 400);
             return;
         }
         let imagen = await bd.query(`SELECT * FROM imagenes_producto WHERE id = ?`, [req.params.id]);
@@ -399,20 +440,20 @@ const deleteImage = async (req, res) => {
             if (imagen != 'uploads/images/productos/default.png') {
                 const result = deleteFile(imagen);
                 if (!result.success) {
-                    res.json(respuesta.error(req, res, { message: result.message, error: result.error }, 400));
+                    respuesta.error(req, res, { message: result.message, error: result.error }, 400);
                     return;
                 }
 
                 await bd.query(`DELETE FROM imagenes_producto WHERE id = ?`, [req.params.id]);
-                res.json(respuesta.success(req, res, { message: 'Imagen eliminada' }, 200));
+                respuesta.success(req, res, { message: 'Imagen eliminada' }, 200);
             } else {
-                res.json(respuesta.error(req, res, { message: 'No se puede eliminar la imagen por defecto' }, 400));
+                respuesta.error(req, res, { message: 'No se puede eliminar la imagen por defecto' }, 400);
             }
         } else {
-            res.json(respuesta.error(req, res, { message: 'No se puede eliminar una imagen activa' }, 400));
+            respuesta.error(req, res, { message: 'No se puede eliminar una imagen activa' }, 400);
         }
     } catch (err) {
-        res.json(respuesta.error(req, res, { message: 'Error al eliminar imagen', error: err }, 500));
+        respuesta.error(req, res, { message: 'Error al eliminar imagen', error: err }, 500);
     }
 }
 
@@ -420,7 +461,7 @@ const addImages = async (req, res) => {
     try {
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
-            res.json(respuesta.error(req, res, { message: tokenAccess.message }, 401));
+            respuesta.error(req, res, { message: tokenAccess.message }, 401);
             return;
         }
 
@@ -433,7 +474,7 @@ const addImages = async (req, res) => {
                     deleteFile(thisFile.path);
                 });
             }
-            res.json(respuesta.error(req, res, { message: 'No se puede tener más de 10 imágenes' }, 400));
+            respuesta.error(req, res, { message: 'No se puede tener más de 10 imágenes' }, 400);
             return;
         }
         const errors = await validate([
@@ -458,7 +499,7 @@ const addImages = async (req, res) => {
                     deleteFile(thisFile.path);
                 });
             }
-            res.json(respuesta.error(req, res, errors.errors, 400));
+            respuesta.error(req, res, errors.errors, 400);
             return;
         }
 
@@ -468,7 +509,7 @@ const addImages = async (req, res) => {
                 req.files['imagenes'].map(img => {
                     let productoResult = saveFile(img, 'images/productos');
                     if (!productoResult.success) {
-                        return res.json(respuesta.error(req, res, { message: productoResult.message, error: productoResult.error }, 400));
+                        return respuesta.error(req, res, { message: productoResult.message, error: productoResult.error }, 400);
                     }
                     imagenes.push(productoResult.newPath);
                 });
@@ -479,14 +520,14 @@ const addImages = async (req, res) => {
         })
         //Eliminar uploads/images/productos/default.png de la base de datos
         await bd.query(`DELETE FROM imagenes_producto WHERE producto_id = ? AND imagen = 'uploads/images/productos/default.png'`, [req.body.producto_id]);
-        res.json(respuesta.success(req, res, { message: 'Imagenes agregadas' }, 200));
+        respuesta.success(req, res, { message: 'Imagenes agregadas' }, 200);
     } catch (err) {
         if (req.files) {
             Object.values(req.files).flat().map(thisFile => {
                 deleteFile(thisFile.path);
             });
         }
-        res.json(respuesta.error(req, res, { message: 'Error al agregar imagenes', error: err }, 500));
+        respuesta.error(req, res, { message: 'Error al agregar imagenes', error: err }, 500);
     }
 }
 

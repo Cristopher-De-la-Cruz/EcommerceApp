@@ -2,6 +2,55 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 
+/* Scroll bar */
+
+::-webkit-scrollbar {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #222;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #d6dee1;
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+.bar-scroll-dark::-webkit-scrollbar {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+.bar-scroll-dark::-webkit-scrollbar-track {
+  background-color: #222;
+}
+
+.bar-scroll-dark::-webkit-scrollbar-thumb {
+  background-color: #d6dee1;
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+.bar-scroll-light::-webkit-scrollbar {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+.bar-scroll-light::-webkit-scrollbar-track {
+  background-color: #aaa;
+}
+
+.bar-scroll-light::-webkit-scrollbar-thumb {
+  background-color: #222;
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
 /* * {
   height: 100%;
   width: 100%;
