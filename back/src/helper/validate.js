@@ -17,7 +17,7 @@ const validate = async (validation = [], req) => {
 
             for (const fieldValue of fieldValues) {
                 // Validar si el campo es requerido
-                if (item.type != "file" && item.required && (!fieldValue || fieldValue === null || fieldValue === undefined)) {
+                if (item.type != "file" && item.required && fieldValue != 0 && (!fieldValue || fieldValue === null || fieldValue === undefined)) {
                     errors.hasErrors = true;
                     errors.errors.push({ message: `${item.field} es obligatorio.` });
                     continue;
@@ -134,30 +134,5 @@ const validate = async (validation = [], req) => {
     return errors;
 };
 
-
-/*
-    validation = [
-        {
-            field: 'nombre',
-            type: 'string',
-            required: true,
-            table: 'categorias',
-            unique: true,
-            min: 3,
-            max: 50,
-        },
-        {
-            field: 'descripcion',
-            type: 'string',
-            required: true,
-            min: 3,
-            max: 50,
-        },
-        {
-            field: 'precio',
-            type: 'number',
-            required: true,
-            min: 0,
-*/
 
 module.exports = validate;

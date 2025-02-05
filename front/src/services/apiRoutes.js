@@ -24,6 +24,12 @@ const apiRoutes = {
         reactiveImage: `${back_host}api/productos/reactiveImage/`,
         deleteImage: `${back_host}api/productos/deleteImage/`,
         addImages: `${back_host}api/productos/addImages`,
+    },
+    carrito: {
+        get: `${back_host}api/carrito_compras`,
+        store: `${back_host}api/carrito_compras`,
+        changeCantidad: `${back_host}api/carrito_compras/changeCantidad/`,
+        inactivate: `${back_host}api/carrito_compras/inactivate/`,
     }
 }
 

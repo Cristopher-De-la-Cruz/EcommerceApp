@@ -1,11 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PropTypes } from 'prop-types';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronRight, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
-export const Carrousel = ({ slides }) => {
-
+export const Carrousel = ({ slides, height = 'h-64', width = 'w-full', autoSlide = false, autoSlideInterval = 5000 }) => {
     const [currentSlide, setCurrentSlide] = useState(0);
+
+    useEffect(() => {
+        let interval;
+        if (autoSlide) {
+            interval = setInterval(() => {
+                setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+            }, autoSlideInterval);
+        }
+
+        return () => {
+            clearInterval(interval); // Limpiar el intervalo cuando el componente se desmonta o cuando autoSlide se cambia
+        };
+    }, [autoSlide, autoSlideInterval, slides.length]);
 
     const handlePrev = () => {
         setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
@@ -16,9 +28,9 @@ export const Carrousel = ({ slides }) => {
     };
 
     return (
-        <div className="relative w-full h-full max-w-2xl mx-auto">
+        <div className={`relative ${width} mx-auto z-10`}>
             {/* Slides */}
-            <div className="relative overflow-hidden rounded-lg">
+            <div className={`relative overflow-hidden rounded-lg ${height}`}>
                 <div
                     className="flex transition-transform duration-500"
                     style={{ transform: `translateX(-${currentSlide * 100}%)` }}
@@ -26,28 +38,29 @@ export const Carrousel = ({ slides }) => {
                     {slides.map((slide) => (
                         <div
                             key={slide.id}
-                            className="min-w-full flex-shrink-0 text-center bg-gray-100 dark:bg-zinc-800"
+                            className={`min-w-full flex justify-center items-center text-center bg-transparent ${height}`}
                         >
                             <img
                                 src={slide.image}
                                 alt={slide.title}
-                                className="w-full h-64 object-cover"
+                                className={`object-cover ${height} rounded-md`}
                             />
                         </div>
                     ))}
                 </div>
+
                 {/* Controls */}
                 <button
                     onClick={handlePrev}
-                    className="absolute top-1/2 left-0 transform -translate-y-1/2 text-black hover:text-white cursor-pointer text-2xl p-2 rounded-full shadow-md focus:outline-none"
+                    className="absolute top-1/2 left-0 transform -translate-y-1/2 text-black dark:text-white hover:text-gray-500 cursor-pointer text-2xl p-2 rounded-full focus:outline-none"
                 >
-                    <FontAwesomeIcon icon={faArrowLeft} />
+                    <FontAwesomeIcon icon={faChevronLeft} />
                 </button>
                 <button
                     onClick={handleNext}
-                    className="absolute top-1/2 right-0 transform -translate-y-1/2 text-black hover:text-white cursor-pointer text-2xl p-2 rounded-full shadow-md focus:outline-none"
+                    className="absolute top-1/2 right-0 transform -translate-y-1/2 text-black dark:text-white hover:text-gray-500 cursor-pointer text-2xl p-2 rounded-full focus:outline-none"
                 >
-                    <FontAwesomeIcon icon={faArrowRight} />
+                    <FontAwesomeIcon icon={faChevronRight} />
                 </button>
             </div>
 
@@ -66,8 +79,17 @@ export const Carrousel = ({ slides }) => {
             </div>
         </div>
     );
-}
+};
 
 Carrousel.propTypes = {
     slides: PropTypes.array.isRequired,
+    height: PropTypes.string, // Clases de Tailwind para definir la altura
+    width: PropTypes.string,  // Clases de Tailwind para definir el ancho
+    autoSlide: PropTypes.bool, // Prop para activar o desactivar el autoslide
+    autoSlideInterval: PropTypes.number, // Intervalo en milisegundos para cambiar de slide automáticamente
 };
+
+// Carrousel.defaultProps = {
+//     autoSlide: false,
+//     autoSlideInterval: 4000, // 3 segundos por defecto
+// };

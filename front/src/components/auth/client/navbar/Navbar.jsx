@@ -6,7 +6,7 @@ import { BarsButton } from "./BarsButton"
 
 export const Navbar = () => {
     return (
-        <div className="duration-400 w-full sticky top-0 h-16 bg-red-800 flex justify-between items-center">
+        <div className="duration-400 w-full z-50 sticky top-0 h-16 bg-red-800 flex justify-between items-center">
             {/* Left */}
             <div className="duration-400 sm:w-2/5 w-5/5 h-full flex items-center gap-5">
                 <div className="w-16 flex justify-end items-center">

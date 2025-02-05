@@ -5,7 +5,7 @@ const { fileMiddleware } = require('../../helper/handleFile');
 
 
 router.get('/', (req, res) => { controller.get(req, res) });
-router.get('/:id', (req, res) => { controller.show(req, res) });
+router.get('/:id/:nombre', (req, res) => { controller.show(req, res) });
 router.get('/showWithAllImages/:id', (req, res) => { controller.showWithAllImages(req, res) });
 router.post('/', fileMiddleware([{name:'imagen'}]), (req, res) => { controller.store(req, res) });
 router.put('/:id', (req, res) => { controller.update(req, res) });

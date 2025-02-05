@@ -56,7 +56,7 @@ export const Register = () => {
                             {/* Carrousel */}
                             <div className='w-full flex justify-center items-center'>
                                 <div className='w-5/6'>
-                                    <Carrousel slides={slides} />
+                                    <Carrousel slides={slides} autoSlide={true} />
                                 </div>
                             </div>
                         </div>

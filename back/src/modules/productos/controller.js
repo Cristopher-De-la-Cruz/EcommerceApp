@@ -16,7 +16,8 @@ const get = async (req, res) => {
         }
 
         // Parámetros opcionales desde req.query
-        const {  estado = 1, precioDesde, precioHasta, categoria, pagina = 1, limite = 10 } = req.query;
+        const { estado = 1, precioDesde, precioHasta, categoria, page = 1, limit = 10 } = req.query;
+        const user_id = token.payload.user_id;
 
         // Base de la consulta
         let query = `
@@ -49,9 +50,9 @@ const get = async (req, res) => {
         const paramsNoLimit = [...params];
 
         // Agregar paginación
-        const offset = (pagina - 1) * limite;
+        const offset = (page - 1) * limit;
         query += ' LIMIT ? OFFSET ?';
-        params.push(parseInt(limite), parseInt(offset));
+        params.push(parseInt(limit), parseInt(offset));
 
         // Ejecutar consulta
         const items = await bd.query(query, params);
@@ -67,12 +68,15 @@ const get = async (req, res) => {
                     ...imagen,
                     imagen: `${config.app.host}${imagen.imagen}`
                 }));
+                //verificar si el producto fue añadido al carrito
+                const carrito = await bd.query(`SELECT * FROM carrito_compras WHERE producto_id = ? AND cliente_id = ? AND estado = 1`, [item.id, user_id]);
+                item.carrito = carrito.length > 0 ? carrito[0] : false;
                 return { ...item, imagenes };
             })
         );
         const productsNoLimit = await bd.query(queryNoLimit, paramsNoLimit);
 
-        respuesta.success(req, res, {productos, maxCount: productsNoLimit.length}, 200);
+        respuesta.success(req, res, { productos, maxCount: productsNoLimit.length }, 200);
     } catch (err) {
         respuesta.error(req, res, { message: 'Error al obtener los productos', error: err }, 500);
     }
@@ -87,6 +91,7 @@ const show = async (req, res) => {
             respuesta.error(req, res, { message: token.message }, 401);
             return;
         }
+        const user_id = token.payload.user_id;
 
         const errors = await validate([
             {
@@ -95,7 +100,14 @@ const show = async (req, res) => {
                 mustExist: true,
                 required: true,
                 params: true,
-            }
+            },
+            // {
+            //     field: 'nombre',
+            //     type: 'string',
+            //     min: 1,
+            //     max: 50,
+            //     params: true,
+            // }
         ], req);
         if (errors.hasErrors) {
             respuesta.error(req, res, errors.errors, 400);
@@ -105,15 +117,20 @@ const show = async (req, res) => {
         let producto = await bd.query(`SELECT p.*, c.nombre AS categoria
             FROM ${TABLA} AS p
             JOIN categorias AS c ON p.categoria_id = c.id
-            WHERE p.id = ?;`, [req.params.id]);
+            WHERE p.id = ? AND p.nombre = ?;`, [req.params.id, req.params.nombre]);
 
-        producto = producto[0];
-        let imagenes = await bd.query(`SELECT * FROM imagenes_producto WHERE producto_id = ? AND estado = 1`, [req.params.id]);
-        imagenes = imagenes.map(imagen => {
-            return { ...imagen, imagen: `${config.app.host}${imagen.imagen}` };
-        });
-        producto.imagenes = imagenes;
-        respuesta.success(req, res, producto, 200);
+        producto = producto.length > 0 ? producto[0] : null;
+        if (producto != null) {
+            let imagenes = await bd.query(`SELECT * FROM imagenes_producto WHERE producto_id = ? AND estado = 1`, [req.params.id]);
+            imagenes = imagenes.map(imagen => {
+                return { ...imagen, imagen: `${config.app.host}${imagen.imagen}` };
+            });
+            producto.imagenes = imagenes;
+            //verificar si el producto fue añadido al carrito
+            const carrito = await bd.query(`SELECT * FROM carrito_compras WHERE producto_id = ? AND cliente_id = ? AND estado = 1`, [producto.id, user_id]);
+            producto.carrito = carrito.length > 0 ? carrito[0] : false;
+        }
+        respuesta.success(req, res, { producto: producto }, 200);
     } catch (err) {
         respuesta.error(req, res, { message: 'Error al obtener el producto', error: err }, 500);
     }

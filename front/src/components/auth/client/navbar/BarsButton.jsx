@@ -2,32 +2,43 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { RenderWithAnimation } from "../../../RenderWithAnimation"
 import { faBars } from "@fortawesome/free-solid-svg-icons"
 import { useContext, useEffect, useState } from "react"
-import { ThemeContext } from "../../../../context/Theme/ThemeContext"
+import { FilterContext } from "../../../../context/Filter/FilterContext"
 import { AuthContext } from "../../../../context/Auth/AuthContext"
 import { useApi } from "../../../../hooks/useApi"
-import { toast, ToastContainer } from "react-toastify"
 import apiRoutes from "../../../../services/apiRoutes"
+import { useNavigate } from "react-router-dom"
+import { ToastContext } from "../../../../context/Toast/ToastContext"
 
 export const BarsButton = () => {
-    const { theme } = useContext(ThemeContext)
+    const { toast, theme } = useContext(ToastContext)
     const { token } = useContext(AuthContext)
     const [categorias, setCategorias] = useState([]);
+    const { setCategoria } = useContext(FilterContext);
 
     const { fetchApi } = useApi();
 
     const getCategories = async () => {
         const response = await fetchApi(apiRoutes.categorias.get, 'GET', null, token)
-        if(response.success) {
+        if (response.success) {
             setCategorias(response.body);
-        } else{
+        } else {
             toast.error(response.body.message || 'Error al obtener las categorías', { position: "bottom-right", theme: theme });
         }
     }
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         getCategories();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    const handleCategoriaClick = (value) => {
+        setCategoria({id: value.id, nombre: value.nombre});
+        if(window.location.pathname !== '/') {
+            navigate('/')
+        }
+    }
 
     return (
         <>
@@ -42,16 +53,18 @@ export const BarsButton = () => {
                     <div className='py-1 px-2 border-b font-bold text-center'>
                         <h2>BUSCAR POR CATEGORÍA</h2>
                     </div>
+                    <div onClick={() => handleCategoriaClick({id: '', nombre: 'Todas las Categorías'}) } className='duration-300 pb-1 px-3 border-b font-bold cursor-pointer hover:scale-105'>
+                        <h2>Todas las Categorías</h2>
+                    </div>
                     {
                         categorias.map(categoria => (
-                            <div key={categoria.id} className='pb-1 px-3 border-b font-bold'>
+                            <div onClick={() => handleCategoriaClick({id: categoria.id, nombre: categoria.nombre})} key={categoria.id} className='duration-300 pb-1 px-3 border-b font-bold cursor-pointer hover:scale-105'>
                                 <h2>{categoria.nombre}</h2>
                             </div>
                         ))
                     }
                 </div>
             </RenderWithAnimation>
-            <ToastContainer />
         </>
     )
 }

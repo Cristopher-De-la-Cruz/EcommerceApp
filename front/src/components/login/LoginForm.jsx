@@ -1,9 +1,8 @@
 import { useApi } from "../../hooks/useApi"
 import { useForm } from "../../hooks/useForm"
-import { ToastContainer, toast } from 'react-toastify';
 import { useContext } from "react";
-import { ThemeContext } from "../../context/Theme/ThemeContext";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { ToastContext } from "../../context/Toast/ToastContext";
 import { InputPassword } from "../InputPassword";
 import apiRoutes from '../../services/apiRoutes';
 
@@ -12,9 +11,9 @@ const initForm = {
     password: '',
 }
 export const LoginForm = () => {
+    const { toast, theme } = useContext(ToastContext);
     const { fetchApi } = useApi();
     const { form, changeForm } = useForm(initForm);
-    const { theme } = useContext(ThemeContext);
     const { login } = useContext(AuthContext);
 
     const handleSubmit = async () => {
@@ -27,18 +26,14 @@ export const LoginForm = () => {
                 toast.warning("El email debe tener al menos 5 caracteres", { position: "bottom-right", theme: theme });
                 return;
             } else if (form.password.length < 8) {
-                toast.warning("El email debe tener al menos 8 caracteres", { position: "bottom-right", theme: theme });
+                toast.warning("La contraseña debe tener al menos 8 caracteres", { position: "bottom-right", theme: theme });
                 return;
             }
             
             const data = await fetchApi(apiRoutes.usuarios.login, 'POST', JSON.stringify(form));
-            console.log(data);
             if (data.success) {
                 toast.success(data.body.message, { position: "bottom-right", theme: theme });
                 const logged = login({ nombre: data.body.user.nombre, email: data.body.user.email, role: data.body.user.role }, data.body.token);
-                console.log(logged);
-                const route = data.body.user.role == 1 ? '/admin' : '/';
-                console.log(route);
                 if (!logged.success) {
                     toast.error('Ha ocurrido un error.', { position: "bottom-right", theme: theme });
                     return;
@@ -79,16 +74,11 @@ export const LoginForm = () => {
                     <p>Password</p>
                     <InputPassword value={form.password} onChange={changeForm} />
                 </div>
-                {/* <div className="flex justify-center items-center gap-2">
-                    <p className="text-xs">Mantener Sesión</p>
-                    <input type="checkbox" />
-                </div> */}
                 <div className="flex justify-center">
                     <button className="duration-400 w-3/4 text-white bg-zinc-950 hover:scale-115 ease-out cursor-pointer font-bold border-2 border-black py-1.5 px-3 rounded-full"
                         onClick={handleSubmit}>Iniciar Sesión</button>
                 </div>
             </div>
-            <ToastContainer />
         </>
     )
 }

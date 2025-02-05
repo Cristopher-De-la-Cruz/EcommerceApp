@@ -1,9 +1,8 @@
 import { useApi } from "../../hooks/useApi"
 import { useForm } from "../../hooks/useForm"
-import { ToastContainer, toast } from 'react-toastify';
 import { useContext } from "react";
-import { ThemeContext } from "../../context/Theme/ThemeContext";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { ToastContext } from "../../context/Toast/ToastContext";
 import { InputPassword } from "../InputPassword";
 import apiRoutes from '../../services/apiRoutes';
 
@@ -17,7 +16,7 @@ export const RegisterForm = () => {
 
     const { fetchApi } = useApi();
     const { form, changeForm } = useForm(initForm);
-    const { theme } = useContext(ThemeContext);
+    const { toast, theme } = useContext(ToastContext);
     const { login } = useContext(AuthContext);
 
     const handleSubmit = async () => {
@@ -38,11 +37,9 @@ export const RegisterForm = () => {
             }
 
             const data = await fetchApi(apiRoutes.usuarios.register, 'POST', JSON.stringify(form));
-            console.log(data);
             if (data.success) {
                 toast.success(data.body.message, { position: "bottom-right", theme: theme });
                 const logged = login({ nombre: data.body.user.nombre, email: data.body.user.email, role: data.body.user.role }, data.body.token);
-                console.log(logged);
                 if (!logged.success) {
                     toast.error('Ha ocurrido un error.', { position: "bottom-right", theme: theme });
                     return;
@@ -94,16 +91,11 @@ export const RegisterForm = () => {
                     <InputPassword value={form.password} onChange={changeForm} />
 
                 </div>
-                {/* <div className="flex justify-center items-center gap-2">
-                    <p className="text-xs">Mantener Sesión</p>
-                    <input type="checkbox" />
-                </div> */}
                 <div className="flex justify-center">
                     <button className="duration-300 w-3/4 text-white bg-zinc-950 hover:scale-115 ease-out cursor-pointer font-bold border-2 border-black py-1.5 px-3 rounded-full"
                         onClick={handleSubmit}>Registrar Cuenta</button>
                 </div>
             </div>
-            <ToastContainer />
         </>
     )
 }
