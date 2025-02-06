@@ -1,8 +1,8 @@
 import { PropTypes } from 'prop-types';
 import { Carrousel } from './Carrousel';
 import { useState } from 'react';
-import { AddToCarButton } from './AddToCarButton';
-import { CarCantControl } from './Carrito/CarCantControl';
+import { AddToCarButton } from './cart/AddToCarButton';
+import { CarCantControl } from './cart/CarCantControl';
 
 
 
@@ -59,7 +59,7 @@ export const ProductShowBody = ({ producto, fetchAgain }) => {
                     <div>
                         {
                             producto.carrito == false ? <AddToCarButton producto={producto} fetchAgain={fetchAgain} />
-                            : <CarCantControl carrito_id={producto.carrito.id} defaultCant={producto.carrito.cantidad} maxCant={producto.stock} fetchAgain={fetchAgain} />
+                            : <CarCantControl carrito_id={producto.carrito.id} defaultCant={producto.carrito.cantidad} product_name={producto.nombre} maxCant={producto.stock} fetchAgain={fetchAgain} />
                         }
                         
                     </div>

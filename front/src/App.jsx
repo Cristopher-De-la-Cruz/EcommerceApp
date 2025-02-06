@@ -8,6 +8,10 @@ import { AdminHome } from "./pages/Auth/Admin/AdminHome"
 import { Register } from "./pages/Register"
 import { ProductShow } from "./pages/Auth/Client/ProductShow"
 import { ToastProvider } from "./context/Toast/ToastProvider"
+import { Carrito } from "./pages/Auth/Client/Carrito"
+import { Compra } from "./pages/Auth/Client/Compra"
+import { MyOrders } from "./pages/Auth/Client/MyOrders"
+import { OrderPage } from "./pages/Auth/Client/OrderPage"
 
 export const App = () => {
   return (
@@ -22,6 +26,10 @@ export const App = () => {
               {/* Client */}
               <Route path="/" element={<Home />} />
               <Route path="/product/:nombreId" element={<ProductShow />} />
+              <Route path="/my-cart" element={<Carrito />} />
+              <Route path="/my-orders" element={<MyOrders />} />
+              <Route path="/my-order/:id" element={<OrderPage />} />
+              <Route path="/buy" element={<Compra />} />
               <Route path="/admin" element={<AdminHome />} />
             </Routes>
           </AuthProvider>

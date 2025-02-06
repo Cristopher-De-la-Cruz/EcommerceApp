@@ -9,7 +9,7 @@ import { useApi } from "../../hooks/useApi";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { ToastContext } from "../../context/Toast/ToastContext";
 
-export const CarCantControl = ({ carrito_id = 0, maxCant = 0, defaultCant = 1, fetchAgain }) => {
+export const CarCantControl = ({ carrito_id = 0, product_name = '', maxCant = 0, defaultCant = 1, fetchAgain, fetchAtChange = false }) => {
     const [cant, setCant] = useState(defaultCant);
     const [clicked, setClicked] = useState(0);
     const [prevCant, setPrevCant] = useState(cant);
@@ -23,15 +23,21 @@ export const CarCantControl = ({ carrito_id = 0, maxCant = 0, defaultCant = 1, f
         optionCant.push(i);
     }
 
+
     const handleCantChange = async () => {
         const response = await fetchApi(apiChangeCant, 'PUT', JSON.stringify({ cantidad: cant }), token);
         if (response.success) {
             setPrevCant(cant);
-            if(cant == 0){
+            if (fetchAtChange) {
                 fetchAgain();
+            } else {
+                if (cant == 0) {
+                    fetchAgain();
+                }
             }
         } else {
             setCant(prevCant);
+            console.log(response.body);
             if (response.status == 400) {
                 response.body.forEach(error => {
                     toast.error(error.message, { position: 'bottom-right', theme: theme });
@@ -64,12 +70,22 @@ export const CarCantControl = ({ carrito_id = 0, maxCant = 0, defaultCant = 1, f
     }
 
     useEffect(() => {
-        console.log(clicked)
-        if(clicked != 0){
+        if (clicked != 0) {
             handleCantChange();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [clicked])
+
+    useEffect(() => {
+        console.log('render');
+        console.log(maxCant);
+        if (maxCant < 1) {
+            setCant(0);
+            setClicked(clicked + 1);
+            toast.warning(`Lo sentimos, el producto ${product_name} se ha agotado`, { position: 'bottom-right', theme: theme });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [maxCant]);
 
     return (
         <>
@@ -90,7 +106,9 @@ export const CarCantControl = ({ carrito_id = 0, maxCant = 0, defaultCant = 1, f
 
 CarCantControl.propTypes = {
     carrito_id: PropTypes.number,
+    product_name: PropTypes.string,
     maxCant: PropTypes.number,
     defaultCant: PropTypes.number,
     fetchAgain: PropTypes.func,
+    fetchAtChange: PropTypes.bool,
 }

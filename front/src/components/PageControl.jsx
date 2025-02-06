@@ -1,20 +1,11 @@
 import { PropTypes } from 'prop-types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons'
-import { useNavigate } from 'react-router-dom';
 
-export const PageControl = ({ pagina, maxCount, limite, path='/' }) => {
-
-    const navigate = useNavigate();
-    const setPagina = (newPage) => {
-        navigate(`${path}?page=${newPage}`);
-    }
+export const PageControl = ({ pagina, setPagina, maxCount, limite}) => {
 
     return (
         <div className="flex sm:flex-row sm:justify-end sm:gap-2 flex-col justify-center sm:items-start items-center">
-            <p>Estás en la página</p>
-
-
             <div className='flex gap-2 items-start'>
                 {/* Botón para retroceder */}
                 <button
@@ -98,7 +89,7 @@ export const PageControl = ({ pagina, maxCount, limite, path='/' }) => {
 
 PageControl.propTypes = {
     pagina: PropTypes.number,
+    setPagina: PropTypes.func,
     maxCount: PropTypes.number,
     limite: PropTypes.any,
-    path: PropTypes.string,
 }

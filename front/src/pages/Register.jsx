@@ -48,7 +48,10 @@ export const Register = () => {
                         <div className="duration-400 w-3/5 h-full bg-slate-100 dark:bg-zinc-900 flex justify-center items-center">
                             <RegisterCard />
                         </div>
-                        <div className="duration-400 w-2/5 h-full bg-red-100 dark:bg-zinc-950 flex flex-col justify-center gap-10 py-15">
+                        <div className="duration-400 w-2/5 h-full bg-red-100 dark:bg-zinc-950 flex flex-col justify-center gap-5 py-15">
+                            <div className='h-30 w-full flex justify-center items-center'>
+                                <img src="/Ecommerce.png" alt="logo" className='h-full' />
+                            </div>
                             <div className='text-center'>
                                 <h1 className='text-5xl font-bold'>Ecommerce App</h1>
                                 <p className='text-sm'>Comercio electrónico al alcance de todos</p>

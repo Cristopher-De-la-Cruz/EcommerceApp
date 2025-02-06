@@ -14,14 +14,16 @@ export const Home = () => {
     const { toast, theme } = useContext(ToastContext);
     const { categoria, limite, setLimite } = useContext(FilterContext);
     const { fetchApi, isLoading } = useApi();
-    const [searchParams] = useSearchParams();
-    const page = Number(searchParams.get('page')) || 1; // Obtener el query string page
+    const [searchParams, setSearchParams] = useSearchParams();
+    // const page = Number(searchParams.get('page')) || 1; // Obtener el query string page
+    const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+
 
     const [productos, setProductos] = useState([]);
-    const [apiURL, setApiURL] = useState(`${apiRoutes.productos.get}?estado=1`);
     const [maxCount, setMaxCount] = useState(0);
     const [precioFilter, setPrecioFilter] = useState({ desde: '', hasta: '' });
     const [filterPrice, setFilterPrice] = useState(false);
+    const [apiURL, setApiURL] = useState(`${apiRoutes.productos.get}?estado=1&page=${page}&limit=${limite}&precioDesde=${precioFilter.desde}&precioHasta=${precioFilter.hasta}&categoria=${categoria.id}`);
 
     const getProductos = async () => {
         const response = await fetchApi(apiURL, 'GET', null, token);
@@ -34,6 +36,7 @@ export const Home = () => {
     };
 
     useEffect(() => {
+        setSearchParams({ page: page })
         setApiURL(
             `${apiRoutes.productos.get}?estado=1&page=${page}&limit=${limite}&precioDesde=${precioFilter.desde}&precioHasta=${precioFilter.hasta}&categoria=${categoria.id}`
         );
@@ -128,7 +131,8 @@ export const Home = () => {
                                 <p className="">por página</p>
                             </div>
                             <div className="xl:w-2/3 w-full flex xl:justify-end justify-center">
-                                <PageControl pagina={page} maxCount={maxCount} limite={limite} path={window.Location.pathname} />
+                                {/* <PageControl pagina={page} maxCount={maxCount} limite={limite} path={window.Location.pathname} /> */}
+                                <PageControl pagina={page} setPagina={setPage} maxCount={maxCount} limite={limite} />
                             </div>
                         </div>
                     </div>

@@ -30,6 +30,11 @@ const apiRoutes = {
         store: `${back_host}api/carrito_compras`,
         changeCantidad: `${back_host}api/carrito_compras/changeCantidad/`,
         inactivate: `${back_host}api/carrito_compras/inactivate/`,
+    },
+    ventas: {
+        get: `${back_host}api/ventas`,
+        show: `${back_host}api/ventas/show/`,
+        store: `${back_host}api/ventas`,
     }
 }
 

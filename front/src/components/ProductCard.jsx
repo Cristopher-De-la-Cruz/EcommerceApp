@@ -1,7 +1,7 @@
 import { PropTypes } from 'prop-types'
 import { useNavigate } from 'react-router-dom'
-import { AddToCarButton } from './AddToCarButton';
-import { CarCantControl } from './Carrito/CarCantControl';
+import { AddToCarButton } from './cart/AddToCarButton';
+import { CarCantControl } from './cart/CarCantControl';
 
 export const ProductCard = ({ producto, watchOnly = true, fetchAgain }) => {
     const navigate = useNavigate();
@@ -47,19 +47,20 @@ export const ProductCard = ({ producto, watchOnly = true, fetchAgain }) => {
                     <p>S/.{producto?.precio}</p>
                 </div>
                 {!watchOnly && (
-                    <button className="w-full" onClick={stopPropagation}>
+                    <div className="w-full" onClick={stopPropagation}>
                         {producto.carrito === false ? (
                             <AddToCarButton producto={producto} onClick={stopPropagation} fetchAgain={fetchAgain} />
                         ) : (
                             <CarCantControl
                                 carrito_id={producto.carrito.id}
+                                product_name={producto.nombre}
                                 maxCant={producto.stock}
                                 defaultCant={producto.carrito.cantidad}
                                 fetchAgain={fetchAgain}
                                 onClick={stopPropagation}
                             />
                         )}
-                    </button>
+                    </div>
                 )}
             </div>
         </div>

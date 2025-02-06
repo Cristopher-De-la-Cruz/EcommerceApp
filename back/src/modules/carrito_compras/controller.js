@@ -3,6 +3,7 @@ const bd = require('../../DB/mysql');
 const respuesta = require('../../helper/respuestas');
 const validate = require('../../helper/validate');
 const jwtHelper = require('../../helper/jwt');
+const config = require('../../config');
 
 const get = async (req, res) => {
     try {
@@ -20,7 +21,14 @@ const get = async (req, res) => {
                 FROM ${TABLA} AS c
                 INNER JOIN productos AS p ON c.producto_id = p.id
                 WHERE c.cliente_id = ? AND c.estado = 1`, [user_id]);
-        respuesta.success(req, res, items, 200);
+
+        //con imagenes del producto
+        const productsCart = await Promise.all(items.map(async (item) => {
+            let imagen = await bd.query(`SELECT * FROM imagenes_producto WHERE producto_id = ? AND estado = 1 LIMIT 1`, [item.producto_id]);
+            imagen = imagen.length > 0 ? `${config.app.host}${imagen[0].imagen}` : `${config.app.host}uploads/images/productos/default.png`;
+            return {...item, imagen: imagen};
+        }));
+        respuesta.success(req, res, productsCart, 200);
     } catch (err) {
         console.log(err);
         respuesta.error(req, res, { message: 'Error al obtener los productos del carrito' }, 500);
@@ -125,10 +133,10 @@ const changeCantidad = async (req, res) => {
                 INNER JOIN productos AS p ON c.producto_id = p.id
                 WHERE c.id = ? AND c.cliente_id = ?`, [req.params.id, user_id]);
 
-        if (!dataCarrito[0].stock) {
-            respuesta.error(req, res, { message: "No se puede agregar cantidad" }, 400);
-            return;
-        }
+        // if (!dataCarrito[0].stock) {
+        //     respuesta.error(req, res, { message: "No se puede agregar cantidad", a: dataCarrito[0].stock }, 402);
+        //     return;
+        // }
 
         const errorsCantidad = await validate([
             {
@@ -140,6 +148,11 @@ const changeCantidad = async (req, res) => {
             }
         ], req);
 
+        // if (!dataCarrito[0].stock) {
+        //     respuesta.error(req, res, { message: "No se puede agregar cantidad", a: dataCarrito[0].stock }, 402);
+        //     return;
+        // }
+
         if (errorsCantidad.hasErrors) {
             respuesta.error(req, res, errorsCantidad.errors, 400);
             return;
@@ -148,9 +161,9 @@ const changeCantidad = async (req, res) => {
         const estado = req.body.cantidad == 0 ? 0 : 1;
 
         await bd.query(`UPDATE ${TABLA} SET cantidad = ?, estado = ? WHERE id = ? AND cliente_id = ?`, [req.body.cantidad, estado, req.params.id, user_id]);
-        respuesta.success(req, res, {message: 'cantidad actualizada'}, 200);
+        respuesta.success(req, res, { message: 'cantidad actualizada' }, 200);
     } catch (err) {
-        respuesta.error(req, res, {message: 'Error al actualizar la categoría'}, 500);
+        respuesta.error(req, res, { message: 'Error al actualizar la categoría' }, 500);
     }
 }
 
@@ -189,9 +202,9 @@ const inactivate = async (req, res) => {
             return;
         }
         await bd.query(`UPDATE ${TABLA} SET estado = ? WHERE id = ? AND cliente_id = ?`, [0, req.params.id, user_id]);
-        respuesta.success(req, res, {message: 'Inactivado'}, 200);
+        respuesta.success(req, res, { message: 'Inactivado' }, 200);
     } catch (Error) {
-        respuesta.error(req, res, {message: 'Error al inactivar'}, 500);
+        respuesta.error(req, res, { message: 'Error al inactivar' }, 500);
     }
 }
 

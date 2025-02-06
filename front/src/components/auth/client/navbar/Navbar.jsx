@@ -12,15 +12,16 @@ export const Navbar = () => {
                 <div className="w-16 flex justify-end items-center">
                     <BarsButton/>
                 </div>
-                <div className="h-10 flex justify-center items-center">
-                    <Link to='/' className="text-white text-2xl font-bold">Ecommerce</Link>
+                <div className="h-10 flex justify-center items-center gap-2">
+                    <Link to='/' className="text-white text-2xl font-bold sm:block hidden">Ecommerce</Link>
+                    <img src="/Ecommerce.png" alt="logo" className="h-full" />
                 </div>
             </div>
             {/* Right */}
             <div className="w-3/5 text-white">
                 <div className="h-full w-full xs:text-black flex justify-end items-center gap-5 px-3">
                     <div>
-                        <Link to='/mis-pedidos' className="flex items-center gap-2">
+                        <Link to='/my-orders' className="flex items-center gap-2">
                             <FontAwesomeIcon icon={faBox} className="text-white text-xl" />
                             <p className="sm:block hidden">
                                 Pedidos
@@ -28,7 +29,7 @@ export const Navbar = () => {
                         </Link>
                     </div>
                     <div>
-                        <Link to='/mi-carrito' className="flex items-center gap-2">
+                        <Link to='/my-cart' className="flex items-center gap-2">
                             <FontAwesomeIcon icon={faCartShopping} className="text-white text-xl" />
                             <p className="sm:block hidden">
                                 Carrito
