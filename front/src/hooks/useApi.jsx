@@ -4,11 +4,12 @@ export const useApi = () => {
   const fetchApi = async (apiUrl = '', method = 'GET', body = {}, token = '') => {
     setIsLoading(true);
     try {
+      const Token = token == '' ? '' : 'Bearer ' + token;
       const response = await fetch(apiUrl, {
         method: method,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token
+          'Authorization': Token
         },
         body: method == 'GET' ? null : body,
 

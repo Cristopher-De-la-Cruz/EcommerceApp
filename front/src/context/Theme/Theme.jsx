@@ -4,7 +4,7 @@ import {PropTypes} from 'prop-types'
 export const Theme = ({ children }) => {
     const { theme } = useContext(ThemeContext)
     return (
-        <div className={theme}>
+        <div className={theme} id="TCont">
             {children}
         </div>
     )

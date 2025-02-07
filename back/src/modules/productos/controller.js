@@ -3,21 +3,23 @@ const bd = require('../../DB/mysql');
 const respuesta = require('../../helper/respuestas');
 const validate = require('../../helper/validate');
 const auth = require('../../auth/auth');
+const jwt = require('jsonwebtoken');
 const jwtHelper = require('../../helper/jwt');
 const { saveFile, deleteFile } = require('../../helper/handleFile');
 const config = require('../../config');
 
 const get = async (req, res) => {
     try {
-        const token = jwtHelper.getTokenPayload(req);
-        if (token.error) {
-            respuesta.error(req, res, { message: token.message }, 401);
-            return;
+        let token = req.headers.authorization;
+        let user_id = null;
+        if(token){
+            token = token.split(' ')[1];
+            const payload = jwt.verify(token, config.jwt.secret);
+            user_id = payload.user_id ? payload.user_id : null;
         }
 
         // Parámetros opcionales desde req.query
         const { estado = 1, precioDesde, precioHasta, categoria, page = 1, limit = 10 } = req.query;
-        const user_id = token.payload.user_id;
 
         // Base de la consulta
         let query = `
@@ -69,8 +71,12 @@ const get = async (req, res) => {
                     imagen: `${config.app.host}${imagen.imagen}`
                 }));
                 //verificar si el producto fue añadido al carrito
-                const carrito = await bd.query(`SELECT * FROM carrito_compras WHERE producto_id = ? AND cliente_id = ? AND estado = 1`, [item.id, user_id]);
-                item.carrito = carrito.length > 0 ? carrito[0] : false;
+                if(user_id != null){
+                    const carrito = await bd.query(`SELECT * FROM carrito_compras WHERE producto_id = ? AND cliente_id = ? AND estado = 1`, [item.id, user_id]);
+                    item.carrito = carrito.length > 0 ? carrito[0] : false;
+                } else {
+                    item.carrito = false;
+                }
                 return { ...item, imagenes };
             })
         );
@@ -78,6 +84,7 @@ const get = async (req, res) => {
 
         respuesta.success(req, res, { productos, maxCount: productsNoLimit.length }, 200);
     } catch (err) {
+        console.log("Error al obtener productos:" + err);
         respuesta.error(req, res, { message: 'Error al obtener los productos', error: err }, 500);
     }
 };
@@ -85,13 +92,13 @@ const get = async (req, res) => {
 
 const show = async (req, res) => {
     try {
-        console.log(req.params['id']);
-        const token = jwtHelper.getTokenPayload(req);
-        if (token.error) {
-            respuesta.error(req, res, { message: token.message }, 401);
-            return;
+        let token = req.headers.authorization;
+        let user_id = null;
+        if(token){
+            token = token.split(' ')[1];
+            const payload = jwt.verify(token, config.jwt.secret);
+            user_id = payload.user_id ? payload.user_id : null;
         }
-        const user_id = token.payload.user_id;
 
         const errors = await validate([
             {
@@ -101,13 +108,6 @@ const show = async (req, res) => {
                 required: true,
                 params: true,
             },
-            // {
-            //     field: 'nombre',
-            //     type: 'string',
-            //     min: 1,
-            //     max: 50,
-            //     params: true,
-            // }
         ], req);
         if (errors.hasErrors) {
             respuesta.error(req, res, errors.errors, 400);
@@ -127,8 +127,12 @@ const show = async (req, res) => {
             });
             producto.imagenes = imagenes;
             //verificar si el producto fue añadido al carrito
-            const carrito = await bd.query(`SELECT * FROM carrito_compras WHERE producto_id = ? AND cliente_id = ? AND estado = 1`, [producto.id, user_id]);
-            producto.carrito = carrito.length > 0 ? carrito[0] : false;
+            if(user_id != null){
+                const carrito = await bd.query(`SELECT * FROM carrito_compras WHERE producto_id = ? AND cliente_id = ? AND estado = 1`, [producto.id, user_id]);
+                producto.carrito = carrito.length > 0 ? carrito[0] : false;
+            } else {
+                producto.carrito = false;
+            }
         }
         respuesta.success(req, res, { producto: producto }, 200);
     } catch (err) {

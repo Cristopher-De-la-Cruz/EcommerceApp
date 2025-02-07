@@ -5,16 +5,19 @@ import { AuthPage } from '../AuthPage';
 import { NoPage } from '../../../pages/NoPage' 
 import bcrypt from 'bcryptjs'
 
-export const ClientPage = ({children}) => {
+export const ClientPage = ({children, publico = false}) => {
     const { user } = useContext(AuthContext)
-
     return (
-        <AuthPage>
-            {bcrypt.compareSync('2', `${user.role}`) ? children : <NoPage/>}
+        <AuthPage publico={publico}>
+            <>
+                {(bcrypt.compareSync('2', `${user.role}`) || user.role == undefined)&& children}
+                {bcrypt.compareSync('1', `${user.role}`) && <NoPage/>}
+            </>
         </AuthPage>
     )
 }
 
 ClientPage.propTypes = {
-    children: PropTypes.node.isRequired
+    children: PropTypes.node.isRequired,
+    publico: PropTypes.bool,
 }

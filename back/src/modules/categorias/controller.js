@@ -7,16 +7,17 @@ const jwtHelper = require('../../helper/jwt');
 
 const get = async (req, res) => {
     try {
-        const token = jwtHelper.getTokenPayload(req);
-        if (token.error) {
-            respuesta.error(req, res, { message: token.message }, 401);
-            return;
-        }
-        const items = await bd.query(`SELECT * FROM ${TABLA}`, []);
+        // const token = jwtHelper.getTokenPayload(req);
+        // if (token.error) {
+        //     respuesta.error(req, res, { message: token.message }, 401);
+        //     return;
+        // }
+        const { estado = 1 } = req.query;
+        const items = await bd.query(`SELECT * FROM ${TABLA} WHERE estado = ?`, [estado]);
         respuesta.success(req, res, items, 200);
         return;
     } catch (err) {
-        console.log(err);
+        console.log("Error al obtener categorias:" + err);
         respuesta.error(req, res, 'Error al obtener las categorías', 500);
         return;
     }

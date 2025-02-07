@@ -8,6 +8,7 @@ import bcrypt from 'bcryptjs'
 const initUser = {
     nombre: '',
     email: '',
+    rol: ''
 };
 
 export const AuthProvider = ({ children }) => {

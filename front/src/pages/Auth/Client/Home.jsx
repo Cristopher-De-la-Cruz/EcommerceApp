@@ -49,7 +49,7 @@ export const Home = () => {
     }, [apiURL]);
 
     return (
-        <Layout title="Home">
+        <Layout title="Home" publico={true}>
             <div className="w-full flex justify-center py-2">
                 <div className="md:w-5/6 w-full flex lg:flex-row flex-col lg:justify-between lg:items-start items-center lg:gap-0 gap-5">
                     {/* Filtros */}

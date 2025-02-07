@@ -2,23 +2,34 @@ import { useContext, useEffect } from 'react'
 import { AuthContext } from '../../context/Auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { PropTypes } from 'prop-types';
+import Cookies from 'js-cookie';
 
-export const AuthPage = ({children}) => {
+export const AuthPage = ({ children, publico = false }) => {
     const { isLogged } = useContext(AuthContext)
     const navigate = useNavigate();
 
     useEffect(() => {
+        // Guardar la ruta actual si no está logueado
         if (!isLogged) {
+            Cookies.set('current_path', window.location.pathname);
+        } else {
+            Cookies.set('current_path', '');
+        }
+    }, [children, isLogged]);
+
+    useEffect(() => {
+        if (!isLogged && !publico) {
             navigate('/login')
         }
-    }, [isLogged, navigate])
+    }, [isLogged, navigate, publico]);
     return (
         <>
-            {isLogged && children}
+            {(isLogged || publico) && children}
         </>
     )
 }
 
 AuthPage.propTypes = {
-    children: PropTypes.node.isRequired
+    children: PropTypes.node.isRequired,
+    publico: PropTypes.bool,
 }

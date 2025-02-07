@@ -34,7 +34,7 @@ export const ProductShow = () => {
 
 
     return (
-        <Layout title={nombre}>
+        <Layout title={nombre} publico={true}>
             {
                 isLoading && producto == false && <p>Cargando producto...</p>
             }

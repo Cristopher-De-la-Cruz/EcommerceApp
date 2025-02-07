@@ -9,12 +9,13 @@ import { useApi } from '../../hooks/useApi';
 import { useContext } from 'react';
 import { AuthContext } from '../../context/Auth/AuthContext';
 import { ToastContext } from '../../context/Toast/ToastContext';
+import { AskForLogin } from '../AskForLogin';
 
 export const AddToCarButton = ({ producto, fetchAgain }) => {
     const [isOpen, setisOpen] = useState(false);
     const [carrito_id, setCarritoId] = useState(0);
     const { fetchApi } = useApi();
-    const { token } = useContext(AuthContext);
+    const { token, isLogged } = useContext(AuthContext);
     const { toast, theme } = useContext(ToastContext);
 
     const addToCar = async () => {
@@ -32,21 +33,42 @@ export const AddToCarButton = ({ producto, fetchAgain }) => {
         fetchAgain();
     }
 
+    const handleClick = () => {
+        if (isLogged) {
+            addToCar();
+        } else {
+            setisOpen(true);
+        }
+    }
+
 
     return (
         <>
             {
-                producto.stock > 0 ? 
-                <button disabled={isOpen}
-                    onClick={() => {
-                        addToCar(); // Aquí puedes manejar la lógica del botón
-                    }}
-                    className="duration-400 w-full border-1 font-bold border-red-700 rounded-full cursor-pointer text-red-700 hover:bg-red-700 hover:text-white p-2"
-                >
-                    AGREGAR
-                </button>
-                :
-                <h2 className='w-full text-center text-2xl font-bold text-red-600'>AGOTADO</h2>
+                producto.stock > 0 ?
+                    <div>
+                        {
+                            isLogged ?
+                                <button disabled={isOpen}
+                                    onClick={() => {
+                                        handleClick(); // Aquí puedes manejar la lógica del botón
+                                    }}
+                                    className="duration-400 w-full border-1 font-bold border-red-700 rounded-full cursor-pointer text-red-700 hover:bg-red-700 hover:text-white p-2"
+                                >
+                                    AGREGAR
+                                </button>
+                                :
+                                <AskForLogin>
+                                    <button
+                                        className="duration-400 w-full border-1 font-bold border-red-700 rounded-full cursor-pointer text-red-700 hover:bg-red-700 hover:text-white p-2"
+                                    >
+                                        AGREGAR
+                                    </button>
+                                </AskForLogin>
+                        }
+                    </div>
+                    :
+                    <h2 className='w-full text-center text-2xl font-bold text-red-600'>AGOTADO</h2>
             }
             {
                 isOpen &&
@@ -73,7 +95,7 @@ export const AddToCarButton = ({ producto, fetchAgain }) => {
                     </div>
                     <div className='h-20 flex justify-around items-center'>
                         <button onClick={() => close()} className='border-2 border-red-800 rounded-full py-1 px-2 cursor-pointer duration-400 hover:bg-red-800 font-medium text-md h-13 w-[45%] flex justify-center items-center hover:text-white hover:scale-105'>Seguir Comprando</button>
-                        <Link className='border-2 border-red-800 rounded-full py-1 px-2 cursor-pointer duration-400 hover:bg-red-800 font-medium text-md h-13 w-[45%] flex justify-center items-center hover:text-white hover:scale-105' to='my-cart'>Ir al Carrito</Link>
+                        <Link className='border-2 border-red-800 rounded-full py-1 px-2 cursor-pointer duration-400 hover:bg-red-800 font-medium text-md h-13 w-[45%] flex justify-center items-center hover:text-white hover:scale-105' to='/my-cart'>Ir al Carrito</Link>
                     </div>
                 </div>
             }

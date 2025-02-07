@@ -5,6 +5,7 @@ import { LoginCard } from '../components/login/LoginCard'
 import { useNavigate } from 'react-router-dom';
 import { ThemeButton } from '../components/ThemeButton';
 import bcrypt from 'bcryptjs'
+import Cookies from 'js-cookie';
 
 const slides = [
     {
@@ -30,8 +31,10 @@ export const Login = () => {
     useEffect(() => {
         if (isLogged) {
             const role = bcrypt.compareSync('1', `${user.role}`);
-            const route = role ? '/admin' : '/';
-            navigate(route)
+            const Rolroute = role ? '/admin' : '/';
+            const currentPath = Cookies.get('current_path') || '';
+            const redirectRoute = currentPath != '' ? currentPath : Rolroute;
+            navigate(redirectRoute)
         } else {
             document.title = 'Login';
         }
