@@ -15,8 +15,9 @@ export const Home = () => {
     const { categoria, limite, setLimite } = useContext(FilterContext);
     const { fetchApi, isLoading } = useApi();
     const [searchParams, setSearchParams] = useSearchParams();
-    // const page = Number(searchParams.get('page')) || 1; // Obtener el query string page
     const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+
+    const [isFirstRender, setIsFirstRender] = useState(true);
 
 
     const [productos, setProductos] = useState([]);
@@ -36,6 +37,10 @@ export const Home = () => {
     };
 
     useEffect(() => {
+        if (isFirstRender) {
+            setIsFirstRender(false);
+            return;
+        }
         setSearchParams({ page: page })
         setApiURL(
             `${apiRoutes.productos.get}?estado=1&page=${page}&limit=${limite}&precioDesde=${precioFilter.desde}&precioHasta=${precioFilter.hasta}&categoria=${categoria.id}`

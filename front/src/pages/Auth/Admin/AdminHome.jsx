@@ -1,15 +1,15 @@
-import { AdminPage } from "../../../components/auth/admin/AdminPage"
 import { useContext } from "react"
 import { AuthContext } from "../../../context/Auth/AuthContext"
+import { AdminLayout } from "../../../components/auth/admin/AdminLayout"
 
 export const AdminHome = () => {
     const { logout } = useContext(AuthContext)
     return (
-        <AdminPage>
+        <AdminLayout>
             <div>
                 <p>AdminHome</p>
                 <button onClick={logout}>Logout</button>
             </div>
-        </AdminPage>
+        </AdminLayout>
     )
 }

@@ -3,12 +3,25 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faUser, faSignIn, faSignOut, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 import { AuthContext } from "../../../../context/Auth/AuthContext";
 import { ThemeContext } from "../../../../context/Theme/ThemeContext";
+import { ToastContext } from "../../../../context/Toast/ToastContext";
 import { Link } from "react-router-dom";
 import { RenderWithAnimation } from "../../../RenderWithAnimation";
 
 export const NavUser = () => {
     const { user, logout, isLogged } = useContext(AuthContext);
     const { theme, toggleTheme } = useContext(ThemeContext);
+    const { toast } = useContext(ToastContext);
+
+    const handleLogout = () => {
+        const logoutResponse = logout();
+        if (logoutResponse.success) {
+            toast.success(logoutResponse.message, { position: "bottom-right", theme: theme });
+        } else {
+            toast.error(logoutResponse.message, { position: "bottom-right", theme: theme });
+        }
+        //Recargar la página si no es redirigido
+        // window.location.reload();
+    }
 
 
     return (
@@ -78,7 +91,7 @@ export const NavUser = () => {
                         </button>
                         {
                             isLogged &&
-                            <button onClick={logout} className="w-full cursor-pointer">
+                            <button onClick={handleLogout} className="w-full cursor-pointer">
                                 <div className="w-[98%] hover:text-gray-500 py-1 border-t border-white dark:border-gray-300 flex gap-2 items-center text-md px-2">
                                     <FontAwesomeIcon icon={faSignOut} /> <p>Cerrar Sesión</p>
                                 </div>

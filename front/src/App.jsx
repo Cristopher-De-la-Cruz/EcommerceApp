@@ -30,6 +30,8 @@ export const App = () => {
               <Route path="/my-orders" element={<MyOrders />} />
               <Route path="/my-order/:id" element={<OrderPage />} />
               <Route path="/buy" element={<Compra />} />
+
+              {/* Admin */}
               <Route path="/admin" element={<AdminHome />} />
             </Routes>
           </AuthProvider>

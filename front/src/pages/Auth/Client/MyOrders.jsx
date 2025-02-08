@@ -11,9 +11,11 @@ import { PageControl } from "../../../components/PageControl"
 export const MyOrders = () => {
     const { fetchApi } = useApi();
     const { toast, theme } = useContext(ToastContext);
-    const { token } = useContext(AuthContext);
+    const { token, isLogged } = useContext(AuthContext);
     const [orders, setOrders] = useState([])
     const [maxCount, setMaxCount] = useState(0)
+    const [isFirstRender, setIsFirstRender] = useState(true);
+
 
     const [searchParams, setSearchParams] = useSearchParams();
     const [desde, setDesde] = useState(searchParams.get('desde') || '');
@@ -35,17 +37,18 @@ export const MyOrders = () => {
         }
     }
 
-    // const addPage = () => {
-    //     setPage(page + 1)
-    // }
-
-
-
     useEffect(() => {
-        setSearchParams({ page: page, desde: desde, hasta: hasta, limit: limit })
-        setApiURL(`${apiRoutes.ventas.get}?desde=${desde}&hasta=${hasta}&page=${page}&limit=${limit}`);
+        if (isFirstRender) {
+            setIsFirstRender(false);
+            return;
+        }
+        
+        if (isLogged){
+            setSearchParams({ page: page, desde: desde, hasta: hasta, limit: limit })
+            setApiURL(`${apiRoutes.ventas.get}?desde=${desde}&hasta=${hasta}&page=${page}&limit=${limit}`);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [desde, hasta, page, limit]);
+    }, [desde, hasta, page, limit, isLogged]);
 
     useEffect(() => {
         getOrders()
@@ -130,7 +133,7 @@ export const MyOrders = () => {
                                 }
                             </div>
                             {
-                                orders.length > 0 && <PageControl pagina={page} setPagina={setPage} maxCount={maxCount} limite={limit} />
+                                (orders.length > 0 || maxCount > 0) && <PageControl pagina={page} setPagina={setPage} maxCount={maxCount} limite={limit} />
                             }
                             <div>
 

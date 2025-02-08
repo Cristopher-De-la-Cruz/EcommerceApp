@@ -17,7 +17,7 @@ export const PageControl = ({ pagina, setPagina, maxCount, limite}) => {
                 </button>
 
                 {/* Botón para ir a la primera página (solo si el máximo es mayor que 1 y no estás ya en la primera página) */}
-                {pagina > 1 && pagina > 4 && Math.ceil(maxCount / limite) > 1 && (
+                {pagina > 1 && pagina > 4 && (
                     <>
                         <button
                             onClick={() => setPagina(1)}

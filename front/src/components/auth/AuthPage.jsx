@@ -11,7 +11,9 @@ export const AuthPage = ({ children, publico = false }) => {
     useEffect(() => {
         // Guardar la ruta actual si no está logueado
         if (!isLogged) {
-            Cookies.set('current_path', window.location.pathname);
+            if (window.location.pathname != '/login' && window.location.pathname != '/register') {
+                Cookies.set('current_path', window.location.pathname, { expires: 1/8 });
+            }
         } else {
             Cookies.set('current_path', '');
         }
