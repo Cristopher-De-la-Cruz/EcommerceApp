@@ -275,6 +275,7 @@ const login = async (req, res) => {
             res.json(respuesta.error(req, res, {message: 'email o contraseña incorrectos'}, 401));
         }
     } catch (err) {
+        console.error('Error al loguear:', err);
         res.json(respuesta.error(req, res, {message: 'Error al loguear'}, 500));
     }
 }

@@ -2,19 +2,26 @@ import { AdminPage } from "./AdminPage"
 import { PropTypes } from 'prop-types'
 import { Navbar } from "./navbar/Navbar"
 import { Sidebar } from "./sidebar/Sidebar"
+import { useEffect } from "react"
 
-export const AdminLayout = ({children}) => {
+export const AdminLayout = ({children, title = 'Ecommerce'}) => {
+
+    useEffect(() => {
+        if (document.title != 'Not Found') document.title = title;
+    }, [title]);
+
+
     return (
         <AdminPage>
             <div className="duration-400 bg-slate-100 dark:bg-zinc-900 text-black dark:text-white h-screen w-full overflow-auto">
                 {/* Navbar */}
                 <Navbar/>
                 {/* Body */}
-                <div className="w-full flex h-full">
+                <div className="w-full flex">
                     {/* Sidebar */}
                     <Sidebar/>
                     {/* Body */}
-                    <div>
+                    <div className="w-full">
                         {children}
                     </div>
                 </div>
@@ -24,5 +31,6 @@ export const AdminLayout = ({children}) => {
 }
 
 AdminLayout.propTypes = {
-    children: PropTypes.node
+    children: PropTypes.node,
+    title: PropTypes.string,
 }

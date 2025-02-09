@@ -19,8 +19,8 @@ export const Navbar = () => {
                 </div>
                 <div className="h-10 flex justify-center items-center">
                     <Link to='/' className="h-10 flex justify-center items-center gap-2">
-                        <p className="text-white text-2xl font-bold sm:block hidden">Ecommerce</p>
                         <img src="/Ecommerce.png" alt="logo" className="h-full" />
+                        <p className="text-white text-2xl font-bold sm:block hidden">Ecommerce</p>
                     </Link>
                 </div>
             </div>

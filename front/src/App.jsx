@@ -12,6 +12,10 @@ import { Carrito } from "./pages/Auth/Client/Carrito"
 import { Compra } from "./pages/Auth/Client/Compra"
 import { MyOrders } from "./pages/Auth/Client/MyOrders"
 import { OrderPage } from "./pages/Auth/Client/OrderPage"
+import { AdminProducts } from "./pages/Auth/Admin/AdminProducts"
+import { AdminCategories } from "./pages/Auth/Admin/AdminCategories"
+import { AdminSales } from "./pages/Auth/Admin/AdminSales"
+import { AdminUsers } from "./pages/Auth/Admin/AdminUsers"
 
 export const App = () => {
   return (
@@ -33,6 +37,10 @@ export const App = () => {
 
               {/* Admin */}
               <Route path="/admin" element={<AdminHome />} />
+              <Route path="/admin/productos" element={<AdminProducts />} />
+              <Route path="/admin/categorias" element={<AdminCategories />} />
+              <Route path="/admin/ventas" element={<AdminSales />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
             </Routes>
           </AuthProvider>
         </FilterProvider>

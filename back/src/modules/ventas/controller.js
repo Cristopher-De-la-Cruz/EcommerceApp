@@ -4,6 +4,7 @@ const respuesta = require('../../helper/respuestas');
 const validate = require('../../helper/validate');
 const jwtHelper = require('../../helper/jwt');
 const config = require('../../config');
+const auth = require('../../auth/auth')
 
 const get = async (req, res) => {
     try {
@@ -53,7 +54,7 @@ const get = async (req, res) => {
             })
         );
 
-        respuesta.success(req, res, {ventas: ventas, maxCount: maxCount}, 200);
+        respuesta.success(req, res, { ventas: ventas, maxCount: maxCount }, 200);
     } catch (err) {
         console.log(err);
         respuesta.error(req, res, { message: 'Error al obtener datos' }, 500);
@@ -111,7 +112,7 @@ const show = async (req, res) => {
                             ...imagen,
                             imagen: `${config.app.host}${imagen.imagen}`,
                         }));
-                        
+
                         // Calcular precio unitario
                         const precio = detalleItem.sub_total / detalleItem.cantidad;
 
@@ -124,7 +125,7 @@ const show = async (req, res) => {
                 // Calcular unidades
                 const unidades = detalle.reduce((acc, d) => acc + d.cantidad, 0);
 
-                return { ...item, total: Math.round(total * 100) / 100, unidades,detalle };
+                return { ...item, total: Math.round(total * 100) / 100, unidades, detalle };
             })
         );
 
@@ -241,9 +242,90 @@ const store = async (req, res) => {
     }
 }
 
+const getDashboard = async (req, res) => {
+    try {
+        const token = auth.AdminPermission(req); // Verifica si el usuario tiene permisos de admin
+        if (token.error) {
+            respuesta.error(req, res, { message: token.message }, 401);
+            return;
+        }
+
+        // Definimos el año actual
+        const year = new Date().getFullYear();
+
+        // Consulta de la cantidad de ventas realizadas en el año actual
+        const totalSalesQuery = `
+            SELECT COUNT(*) AS total_ventas
+            FROM ventas
+            WHERE YEAR(fecha) = ? AND estado = 1
+        `;
+        const totalSales = await bd.query(totalSalesQuery, [year]);
+
+        // Consulta de la cantidad de unidades vendidas en el año actual
+        const totalUnitsQuery = `
+            SELECT SUM(dv.cantidad) AS total_unidades
+            FROM detalle_ventas dv
+            INNER JOIN ventas v ON dv.venta_id = v.id
+            WHERE YEAR(v.fecha) = ? AND v.estado = 1
+        `;
+        const totalUnits = await bd.query(totalUnitsQuery, [year]);
+
+        // Consulta de los ingresos totales en el año actual
+        const totalIncomeQuery = `
+            SELECT SUM(dv.sub_total) AS total_ingreso
+            FROM detalle_ventas dv
+            INNER JOIN ventas v ON dv.venta_id = v.id
+            WHERE YEAR(v.fecha) = ? AND v.estado = 1
+        `;
+        const totalIncome = await bd.query(totalIncomeQuery, [year]);
+
+        // Consulta de los 10 productos que generaron más ingresos en el año
+        const topProductsQuery = `
+            SELECT p.id, p.nombre, SUM(dv.sub_total) AS ingreso
+            FROM detalle_ventas dv
+            INNER JOIN productos p ON dv.producto_id = p.id
+            INNER JOIN ventas v ON dv.venta_id = v.id
+            WHERE YEAR(v.fecha) = ? AND v.estado = 1
+            GROUP BY dv.producto_id
+            ORDER BY ingreso DESC
+            LIMIT 10
+        `;
+        const topProducts = await bd.query(topProductsQuery, [year]);
+
+        // Consulta de las 5 categorías con más ventas en el año
+        const topCategoriesQuery = `
+            SELECT c.id, c.nombre, COUNT(dv.id) AS total_sales
+            FROM detalle_ventas dv
+            INNER JOIN productos p ON dv.producto_id = p.id
+            INNER JOIN categorias c ON p.categoria_id = c.id
+            INNER JOIN ventas v ON dv.venta_id = v.id
+            WHERE YEAR(v.fecha) = ? AND v.estado = 1
+            GROUP BY c.id
+            ORDER BY total_sales DESC
+            LIMIT 5
+        `;
+        const topCategories = await bd.query(topCategoriesQuery, [year]);
+
+        // Responder con los resultados
+        respuesta.success(req, res, {
+            total_ventas: totalSales[0].total_ventas,
+            total_unidades: totalUnits[0].total_unidades,
+            total_ingreso: totalIncome[0].total_ingreso,
+            top_products: topProducts,
+            top_categories: topCategories
+        }, 200);
+
+    } catch (err) {
+        console.error('Error al obtener los datos de ventas:', err);
+        respuesta.error(req, res, { message: 'Error al obtener datos' }, 500);
+    }
+};
+
+
 
 module.exports = {
     get,
     show,
     store,
+    getDashboard
 }

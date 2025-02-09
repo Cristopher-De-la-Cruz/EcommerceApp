@@ -35,6 +35,7 @@ const apiRoutes = {
         get: `${back_host}api/ventas`,
         show: `${back_host}api/ventas/show/`,
         store: `${back_host}api/ventas`,
+        dashboard: `${back_host}api/ventas/getDashboard`,
     }
 }
 
