@@ -5,7 +5,18 @@ import { faExternalLink, faTrash } from "@fortawesome/free-solid-svg-icons"
 import { Link } from "react-router-dom"
 import { InactiveProductCart } from "./InactiveProductCart"
 
-export const ProductCart = ({product, fetchAgain}) => {
+export const ProductCart = ({ product, fetchAgain }) => {
+
+    let subtotal = Math.round((product.precio * product.cantidad) * 100);
+    subtotal = subtotal.toString();
+
+    if (subtotal.length <= 2) {
+        subtotal = '0.' + '00'.slice(subtotal.length) + subtotal;
+    } else {
+        // Insertar el punto decimal antes de los dos últimos dígitos
+        subtotal = subtotal.slice(0, subtotal.length - 2) + '.' + subtotal.slice(subtotal.length - 2);
+    }
+
     return (
         <>
             <div className="w-full lg:max-h-3 min-h-30 grid lg:grid-cols-6 grid-cols-1 lg:border-0 lg:p-0 p-3 border-2 rounded-lg relative lg:gap-0 gap-2">
@@ -30,14 +41,14 @@ export const ProductCart = ({product, fetchAgain}) => {
                 </div>
                 <div className="h-full flex flex-col justify-center items-center gap-2 px-2">
                     <p>Total: </p>
-                    <p className="text-2xl font-bold">S/.{product.precio * product.cantidad}</p>
+                    <p className="text-2xl font-bold">S/.{subtotal}</p>
                 </div>
                 <div className="absolute top-1 right-2 flex gap-3 items-center">
                     <Link to={`/product/${product.nombre}-${product.producto_id}`} className="duration-300 text-md hover:text-blue-500 cursor-pointer">
-                        <FontAwesomeIcon icon={faExternalLink}/>
+                        <FontAwesomeIcon icon={faExternalLink} />
                     </Link>
                     <InactiveProductCart carrito_id={product.id} fetchAgain={fetchAgain}>
-                        <FontAwesomeIcon icon={faTrash}/>
+                        <FontAwesomeIcon icon={faTrash} />
                     </InactiveProductCart>
                 </div>
             </div>

@@ -20,8 +20,8 @@ export const BarsButton = () => {
     const getCategories = async () => {
         const response = await fetchApi(apiRoutes.categorias.get, 'GET', null, token)
         if (response.success) {
-            setCategorias(response.body);
-        } else {
+            setCategorias(response.body.categorias);
+    } else {
             toast.error(response.body.message || 'Error al obtener las categorías', { position: "bottom-right", theme: theme });
         }
     }

@@ -18,7 +18,7 @@ const apiRoutes = {
         show: `${back_host}api/productos/`,
         showWithAllImages: `${back_host}api/productos/showWithAllImages/`,
         store: `${back_host}api/productos`,
-        update: `${back_host}api/productos`,
+        update: `${back_host}api/productos/`,
         toggleState: `${back_host}api/productos/toggleState/`,
         inactiveImage: `${back_host}api/productos/inactiveImage/`,
         reactiveImage: `${back_host}api/productos/reactiveImage/`,

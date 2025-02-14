@@ -1,7 +1,7 @@
 import { PropTypes } from 'prop-types'
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle, faX } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faClose } from '@fortawesome/free-solid-svg-icons';
 import { CarCantControl } from './CarCantControl';
 import { Link } from 'react-router-dom';
 import apiRoutes from '../../services/apiRoutes';
@@ -76,7 +76,7 @@ export const AddToCarButton = ({ producto, fetchAgain }) => {
                     <div className='h-15 relative flex justify-center items-center'>
                         <p className='text-lg font-bold text-green-600 flex items-center gap-2'><FontAwesomeIcon icon={faCheckCircle} /> Has agregado este producto a tu carrito</p>
                         <button className='absolute top-0 right-0 p-2 text-black dark:text-white hover:text-gray-500 cursor-pointer text-md cursor-pointer'>
-                            <FontAwesomeIcon icon={faX} onClick={() => close()} />
+                            <FontAwesomeIcon icon={faClose} onClick={() => close()} />
                         </button>
                     </div>
                     <div className='h-20 flex justify-around items-center'>

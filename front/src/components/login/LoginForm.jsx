@@ -13,7 +13,7 @@ const initForm = {
 export const LoginForm = () => {
     const { toast, theme } = useContext(ToastContext);
     const { fetchApi } = useApi();
-    const { form, changeForm } = useForm(initForm);
+    const { form, changeForm, onKeyDown } = useForm(initForm);
     const { login } = useContext(AuthContext);
 
     const handleSubmit = async () => {
@@ -29,7 +29,7 @@ export const LoginForm = () => {
                 toast.warning("La contraseña debe tener al menos 8 caracteres", { position: "bottom-right", theme: theme });
                 return;
             }
-            
+
             const data = await fetchApi(apiRoutes.usuarios.login, 'POST', JSON.stringify(form));
             if (data.success) {
                 toast.success(data.body.message, { position: "bottom-right", theme: theme });
@@ -56,6 +56,9 @@ export const LoginForm = () => {
         }
     };
 
+    const handleKeyDown = (e) => {
+        onKeyDown(e, handleSubmit)
+    }
 
     return (
         <>
@@ -67,12 +70,13 @@ export const LoginForm = () => {
                         name="email"
                         value={form.email}
                         onChange={changeForm}
+                        onKeyDown={handleKeyDown}
                         autoComplete="off"
                     />
                 </div>
                 <div>
                     <p>Password</p>
-                    <InputPassword value={form.password} onChange={changeForm} />
+                    <InputPassword value={form.password} onChange={changeForm} onKeyDown={handleKeyDown} />
                 </div>
                 <div className="flex justify-center">
                     <button className="duration-400 w-3/4 text-white bg-zinc-950 hover:scale-115 ease-out cursor-pointer font-bold border-2 border-black py-1.5 px-3 rounded-full"

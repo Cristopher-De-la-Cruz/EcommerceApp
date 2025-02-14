@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Cookies from 'js-cookie';
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(Cookies.get('theme') || 'light');
+  const [theme, setTheme] = useState(Cookies.get('theme') || 'dark');
 
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';

@@ -13,10 +13,25 @@ export const useForm = (initForm = {}) => {
         setForm(initForm);
     }
 
+    const onKeyDown = (e, enterFunction) => {
+        if(enterFunction != null){
+            if (e.key === "Enter") {
+                enterFunction();
+            }
+        }
+        if(e.key === "Escape"){
+            setForm({
+                ...form,
+                [e.target.name]: initForm[`${e.target.name}`]
+            });
+        }
+    }
+
     return {
         form,
         ...form,
         changeForm,
-        resetForm
+        resetForm,
+        onKeyDown
     }
 }

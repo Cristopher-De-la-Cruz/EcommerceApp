@@ -30,15 +30,26 @@ export const Compra = () => {
         return acum + product.cantidad
     }, 0)
     const total = products.reduce((acum, product) => {
-        return acum + product.precio * product.cantidad
-    }, 0)
+        acum = (acum * 100) + Math.round((product.precio * product.cantidad) * 100);
+
+        acum = acum.toString();
+
+        if (acum.length <= 2) {
+            acum = '0.' + '00'.slice(acum.length) + acum;
+        } else {
+            acum = acum.slice(0, acum.length - 2) + '.' + acum.slice(acum.length - 2);
+        }
+
+        return parseFloat(acum);
+    }, 0);
+
     return (
         <Layout title={'Finalizar la compra'}>
             <div className="h-full w-full flex md:flex-row flex-col">
                 <div className="md:w-4/6 w-full h-full flex justify-center items-center py-10">
-                    <VentaForm/>
+                    <VentaForm />
                 </div>
-                <div style={{height: 'calc(100vh - 4rem)'}} className="md:w-2/6 w-full sticky top-16 bg-white dark:bg-black p-3 flex flex-col gap-5">
+                <div style={{ height: 'calc(100vh - 4rem)' }} className="md:w-2/6 w-full sticky top-16 bg-white dark:bg-black p-3 flex flex-col gap-5">
                     <div className="border-b-2 py-2 text-center">
                         <h2 className="text-2xl font-semibold">Resumen de la compra</h2>
                     </div>
@@ -46,21 +57,34 @@ export const Compra = () => {
                         <div className="flex w-full h-full justify-center">
                             <div className="w-[95%]">
                                 {
-                                    products.map((product, index) => (
-                                        <div key={index} className="flex flex-start gap-2 truncate h-20 my-3">
-                                            <div className="h-full w-20 min-w-20">
-                                                <Link to={`/product/${product.nombre}-${product.producto_id}`} className="h-full w-full flex justify-center items-center">
-                                                    <img src={product.imagen} alt={product.nombre} className="h-full rounded-md object-cover " />
-                                                </Link>
-                                            </div>
-                                            <div className="h-full">
-                                                <p title={product.nombre} className="text-lg w-full truncate font-semibold">({product.cantidad}) {product.nombre} </p>
-                                                <p className="text-sm text-blue-500 font-semibold">S/.{product.precio}</p>
-                                                <p className="text-xl text-red-600 font-bold">S/.{product.precio * product.cantidad}</p>
-                                            </div>
-                                        </div>
+                                    products.map((product, index) => {
 
-                                    ))
+                                        let subtotal = Math.round((product.precio * product.cantidad) * 100);
+                                        subtotal = subtotal.toString();
+
+                                        if (subtotal.length <= 2) {
+                                            subtotal = '0.' + '00'.slice(subtotal.length) + subtotal;
+                                        } else {
+                                            // Insertar el punto decimal antes de los dos últimos dígitos
+                                            subtotal = subtotal.slice(0, subtotal.length - 2) + '.' + subtotal.slice(subtotal.length - 2);
+                                        }
+
+                                        return (
+                                            <div key={index} className="flex flex-start gap-2 truncate h-20 my-3">
+                                                <div className="h-full w-20 min-w-20">
+                                                    <Link to={`/product/${product.nombre}-${product.producto_id}`} className="h-full w-full flex justify-center items-center">
+                                                        <img src={product.imagen} alt={product.nombre} className="h-full rounded-md object-cover " />
+                                                    </Link>
+                                                </div>
+                                                <div className="h-full">
+                                                    <p title={product.nombre} className="text-lg w-full truncate font-semibold">({product.cantidad}) {product.nombre} </p>
+                                                    <p className="text-sm text-blue-500 font-semibold">S/.{product.precio}</p>
+                                                    <p className="text-xl text-red-600 font-bold">S/.{subtotal}</p>
+                                                </div>
+                                            </div>
+
+                                        )
+                                    })
                                 }
                             </div>
                         </div>

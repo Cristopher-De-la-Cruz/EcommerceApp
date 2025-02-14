@@ -15,7 +15,7 @@ const initForm = {
 export const RegisterForm = () => {
 
     const { fetchApi } = useApi();
-    const { form, changeForm } = useForm(initForm);
+    const { form, changeForm, onKeyDown } = useForm(initForm);
     const { toast, theme } = useContext(ToastContext);
     const { login } = useContext(AuthContext);
 
@@ -62,6 +62,10 @@ export const RegisterForm = () => {
         }
     };
 
+    const handleKeyDown = (e) => {
+        onKeyDown(e, handleSubmit)
+    }
+
 
     return (
         <>
@@ -73,6 +77,7 @@ export const RegisterForm = () => {
                         name="nombre"
                         value={form.nombre}
                         onChange={changeForm}
+                        onKeyDown={handleKeyDown}
                         autoComplete="off"
                     />
                 </div>
@@ -83,12 +88,13 @@ export const RegisterForm = () => {
                         name="email"
                         value={form.email}
                         onChange={changeForm}
+                        onKeyDown={handleKeyDown}
                         autoComplete="off"
                     />
                 </div>
                 <div>
                     <p>Password</p>
-                    <InputPassword value={form.password} onChange={changeForm} />
+                    <InputPassword value={form.password} onChange={changeForm} onKeyDown={handleKeyDown} />
 
                 </div>
                 <div className="flex justify-center">

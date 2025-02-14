@@ -14,23 +14,33 @@ export const ProductShow = () => {
     const { fetchApi, isLoading } = useApi();
     const { token } = useContext(AuthContext);
     const { toast, theme } = useContext(ToastContext);
-    const apiShow = `${apiRoutes.productos.show}/${id}/${nombre}`;
 
     const [producto, setProducto] = useState(false);
 
     const getProducto = async () => {
-        const response = await fetchApi(apiShow, 'GET', null, token);
-        if (response.success) {
-            setProducto(response.body.producto);
-        } else {
-            toast.error(response.body.message || 'Error al obtener el producto', { position: 'bottom-right', theme: theme });
+        try {
+            const response = await fetchApi(`${apiRoutes.productos.show}/${id}/${nombre}`, 'GET', null, token);
+            if (response.success) {
+                setProducto(response.body.producto);
+            } else {
+                if (response.status == 400) {
+                    response.body.forEach(error => {
+                        toast.warning(error.message, { position: 'bottom-right', theme: theme })
+                    })
+                } else {
+                    toast.error(response.body.message, { position: 'bottom-right', theme: theme })
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('Error al obtener el producto', { position: 'bottom-right', theme: theme });
         }
     };
 
     useEffect(() => {
         getProducto();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [apiShow]);
+    }, []);
 
 
     return (

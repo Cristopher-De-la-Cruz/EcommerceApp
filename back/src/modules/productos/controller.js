@@ -12,14 +12,14 @@ const get = async (req, res) => {
     try {
         let token = req.headers.authorization;
         let user_id = null;
-        if(token){
+        if (token) {
             token = token.split(' ')[1];
             const payload = jwt.verify(token, config.jwt.secret);
             user_id = payload.user_id ? payload.user_id : null;
         }
 
         // Parámetros opcionales desde req.query
-        const { estado = 1, precioDesde, precioHasta, categoria, page = 1, limit = 10 } = req.query;
+        const { estado = 1, precioDesde, precioHasta, stockDesde, stockHasta, categoria, page = 1, limit = 10 } = req.query;
 
         // Base de la consulta
         let query = `
@@ -42,6 +42,14 @@ const get = async (req, res) => {
         if (precioHasta) {
             query += ' AND u.precio <= ?';
             params.push(precioHasta);
+        }
+        if (stockDesde) {
+            query += ' AND u.stock >= ?';
+            params.push(stockDesde);
+        }
+        if (stockHasta) {
+            query += ' AND u.stock <= ?';
+            params.push(stockHasta);
         }
         if (categoria) {
             query += ' AND c.id = ?';
@@ -66,12 +74,15 @@ const get = async (req, res) => {
                     `SELECT * FROM imagenes_producto WHERE producto_id = ? AND estado = 1`,
                     [item.id]
                 );
+                if(imagenes.length < 1){
+                    imagenes = [{imagen: `${config.app.host}uploads/images/productos/default.png`}]
+                }
                 imagenes = imagenes.map(imagen => ({
                     ...imagen,
                     imagen: `${config.app.host}${imagen.imagen}`
                 }));
                 //verificar si el producto fue añadido al carrito
-                if(user_id != null){
+                if (user_id != null) {
                     const carrito = await bd.query(`SELECT * FROM carrito_compras WHERE producto_id = ? AND cliente_id = ? AND estado = 1`, [item.id, user_id]);
                     item.carrito = carrito.length > 0 ? carrito[0] : false;
                 } else {
@@ -94,7 +105,7 @@ const show = async (req, res) => {
     try {
         let token = req.headers.authorization;
         let user_id = null;
-        if(token){
+        if (token) {
             token = token.split(' ')[1];
             const payload = jwt.verify(token, config.jwt.secret);
             user_id = payload.user_id ? payload.user_id : null;
@@ -127,7 +138,7 @@ const show = async (req, res) => {
             });
             producto.imagenes = imagenes;
             //verificar si el producto fue añadido al carrito
-            if(user_id != null){
+            if (user_id != null) {
                 const carrito = await bd.query(`SELECT * FROM carrito_compras WHERE producto_id = ? AND cliente_id = ? AND estado = 1`, [producto.id, user_id]);
                 producto.carrito = carrito.length > 0 ? carrito[0] : false;
             } else {
@@ -142,7 +153,6 @@ const show = async (req, res) => {
 
 const showWithAllImages = async (req, res) => {
     try {
-        console.log(req.params['id']);
         const token = jwtHelper.getTokenPayload(req);
         if (token.error) {
             respuesta.error(req, res, { message: token.message }, 401);
@@ -158,6 +168,7 @@ const showWithAllImages = async (req, res) => {
                 params: true,
             }
         ], req);
+
         if (errors.hasErrors) {
             respuesta.error(req, res, errors.errors, 400);
             return;
@@ -166,8 +177,12 @@ const showWithAllImages = async (req, res) => {
         let producto = await bd.query(`SELECT p.*, c.nombre AS categoria
             FROM ${TABLA} AS p
             JOIN categorias AS c ON p.categoria_id = c.id
-            WHERE p.id = ?;`, [req.params.id]);
-
+            WHERE p.id = ? AND p.nombre = ?;`, [req.params.id, req.params.nombre]);
+        
+        if(producto.length < 1){
+            respuesta.error(req, res, { message: 'Producto no encontrado' }, 400);
+            return;
+        }
         producto = producto[0];
         let imagenes = await bd.query(`SELECT * FROM imagenes_producto WHERE producto_id = ?`, [req.params.id]);
         imagenes = imagenes.map(imagen => {
@@ -176,12 +191,18 @@ const showWithAllImages = async (req, res) => {
         producto.imagenes = imagenes;
         respuesta.success(req, res, producto, 200);
     } catch (err) {
+        console.log(err);
         respuesta.error(req, res, { message: 'Error al obtener el producto', error: err }, 500);
     }
 }
 
 const store = async (req, res) => {
     try {
+        let body = { ...req.body };
+        if (body.imagen != null) {
+            delete body.imagen;
+        }
+
         const tokenAccess = auth.AdminPermission(req);
         if (tokenAccess.error) {
             respuesta.error(req, res, { message: tokenAccess.message }, 401);
@@ -193,7 +214,7 @@ const store = async (req, res) => {
                 field: 'nombre',
                 type: 'string',
                 required: true,
-                min: 1,
+                min: 3,
                 max: 50,
             },
             {
@@ -245,14 +266,16 @@ const store = async (req, res) => {
                 req.files['imagen'].map(img => {
                     let productoResult = saveFile(img, 'images/productos');
                     if (!productoResult.success) {
-                        return respuesta.error(req, res, { message: productoResult.message, error: productoResult.error }, 400);
+                        return respuesta.error(req, res, { message: productoResult.message, error: productoResult.error }, 402);
                     }
                     imagenes.push(productoResult.newPath);
                 });
             }
         }
 
-        const producto = await bd.query(`INSERT INTO ${TABLA} set ?`, [req.body]);
+        
+
+        const producto = await bd.query(`INSERT INTO ${TABLA} set ?`, [body]);
         if (imagenes.length > 0) {
             imagenes.map(async (imagen) => {
                 await bd.query(`INSERT INTO imagenes_producto set ?`, [{ producto_id: producto.insertId, imagen: imagen }]);
@@ -262,7 +285,6 @@ const store = async (req, res) => {
         }
 
         respuesta.success(req, res, { message: 'Producto creado' }, 200);
-        console.log('producto creado');
     } catch (err) {
         console.error('Error al guardar el producto:', err);
         respuesta.error(req, res, { message: 'Error al guardar el producto', error: err }, 500);
@@ -382,9 +404,8 @@ const inactiveImage = async (req, res) => {
         const imagen = await bd.query(`SELECT producto_id FROM imagenes_producto WHERE id = ?`, [req.params.id]);
         const productoId = imagen[0].producto_id;
         const imagenes = await bd.query(`SELECT * FROM imagenes_producto WHERE producto_id = ? AND estado = 1`, [productoId]);
-        console.log(imagenes.length);
         if (imagenes.length < 2) {
-            respuesta.error(req, res, { message: 'No se puede inactivar la única imagen' }, 400);
+            respuesta.error(req, res, { message: 'No se puede inactivar la única imagen' }, 402);
             return;
         }
 
@@ -418,10 +439,14 @@ const reactiveImage = async (req, res) => {
             return;
         }
 
+        let producto_id = await bd.query(`SELECT producto_id FROM imagenes_producto WHERE id = ?`, [req.params.id]);
+        producto_id = producto_id[0].producto_id;
+
         // verificar que el producto tenga menos de 10 imagenes
-        const imagenes = await bd.query(`SELECT * FROM imagenes_producto WHERE producto_id = ? AND estado = 1`, [req.params.id]);
+        const imagenes = await bd.query(`SELECT * FROM imagenes_producto WHERE producto_id = ? AND estado = 1`, [producto_id]);
+        console.log(imagenes.length);
         if (imagenes.length >= 10) {
-            respuesta.error(req, res, { message: 'No se puede tener más de 10 imágenes' }, 400);
+            respuesta.error(req, res, { message: 'No se puede tener más de 10 imágenes' }, 402);
             return;
         }
 
@@ -455,23 +480,22 @@ const deleteImage = async (req, res) => {
             return;
         }
         let imagen = await bd.query(`SELECT * FROM imagenes_producto WHERE id = ?`, [req.params.id]);
-        console.log(imagen)
         if (imagen[0].estado == 0) {
             imagen = imagen[0].imagen;
             if (imagen != 'uploads/images/productos/default.png') {
                 const result = deleteFile(imagen);
                 if (!result.success) {
-                    respuesta.error(req, res, { message: result.message, error: result.error }, 400);
+                    respuesta.error(req, res, { message: result.message, error: result.error }, 402);
                     return;
                 }
 
                 await bd.query(`DELETE FROM imagenes_producto WHERE id = ?`, [req.params.id]);
                 respuesta.success(req, res, { message: 'Imagen eliminada' }, 200);
             } else {
-                respuesta.error(req, res, { message: 'No se puede eliminar la imagen por defecto' }, 400);
+                respuesta.error(req, res, { message: 'No se puede eliminar la imagen por defecto' }, 402);
             }
         } else {
-            respuesta.error(req, res, { message: 'No se puede eliminar una imagen activa' }, 400);
+            respuesta.error(req, res, { message: 'No se puede eliminar una imagen activa' }, 402);
         }
     } catch (err) {
         respuesta.error(req, res, { message: 'Error al eliminar imagen', error: err }, 500);
@@ -486,6 +510,9 @@ const addImages = async (req, res) => {
             return;
         }
 
+        console.log(req.files);
+        console.log(req.body);
+
         //Exceptuar la imagen uploads/images/productos/default.png y estado 0
         const imagenesProducto = await bd.query(`SELECT * FROM imagenes_producto WHERE producto_id = ? AND imagen != 'uploads/images/productos/default.png' AND estado = 1`, [req.body.producto_id]);
         const maxCount = 10 - imagenesProducto.length;
@@ -495,7 +522,7 @@ const addImages = async (req, res) => {
                     deleteFile(thisFile.path);
                 });
             }
-            respuesta.error(req, res, { message: 'No se puede tener más de 10 imágenes' }, 400);
+            respuesta.error(req, res, { message: 'No se puede tener más de 10 imágenes' }, 402);
             return;
         }
         const errors = await validate([
@@ -530,7 +557,7 @@ const addImages = async (req, res) => {
                 req.files['imagenes'].map(img => {
                     let productoResult = saveFile(img, 'images/productos');
                     if (!productoResult.success) {
-                        return respuesta.error(req, res, { message: productoResult.message, error: productoResult.error }, 400);
+                        return respuesta.error(req, res, { message: productoResult.message, error: productoResult.error }, 402);
                     }
                     imagenes.push(productoResult.newPath);
                 });

@@ -9,8 +9,18 @@ export const CartBody = ({ products, fetchAgain, isLoading }) => {
     }, 0)
 
     const total = products.reduce((acum, product) => {
-        return acum + product.precio * product.cantidad
-    }, 0)
+        acum = (acum * 100) + Math.round((product.precio * product.cantidad) * 100);
+
+        acum = acum.toString();
+
+        if (acum.length <= 2) {
+            acum = '0.' + '00'.slice(acum.length) + acum;
+        } else {
+            acum = acum.slice(0, acum.length - 2) + '.' + acum.slice(acum.length - 2);
+        }
+
+        return parseFloat(acum);
+    }, 0);
 
 
     return (
@@ -56,7 +66,7 @@ export const CartBody = ({ products, fetchAgain, isLoading }) => {
                             <div className="flex justify-start">
                                 <p className="text-md font-semibold">Total:</p>
                             </div>
-                            <div className="flex justify-start">
+                            <div className="flex justify-start truncate">
                                 <p className="text-lg font-bold">S/.{total}</p>
                             </div>
                         </div>

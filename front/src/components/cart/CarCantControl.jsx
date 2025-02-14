@@ -37,7 +37,6 @@ export const CarCantControl = ({ carrito_id = 0, product_name = '', maxCant = 0,
             }
         } else {
             setCant(prevCant);
-            console.log(response.body);
             if (response.status == 400) {
                 response.body.forEach(error => {
                     toast.error(error.message, { position: 'bottom-right', theme: theme });
@@ -77,8 +76,6 @@ export const CarCantControl = ({ carrito_id = 0, product_name = '', maxCant = 0,
     }, [clicked])
 
     useEffect(() => {
-        console.log('render');
-        console.log(maxCant);
         if (maxCant < 1) {
             setCant(0);
             setClicked(clicked + 1);

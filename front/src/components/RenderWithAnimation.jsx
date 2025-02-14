@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { PropTypes } from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faX } from "@fortawesome/free-solid-svg-icons";
+import { faClose } from "@fortawesome/free-solid-svg-icons";
 import ReactDOM from "react-dom";
 
 export const RenderWithAnimation = ({
@@ -72,34 +72,15 @@ export const RenderWithAnimation = ({
                                         onClick={() => setIsOpen(false)}
                                         className="duration-400 absolute top-0 right-0 text-black dark:text-white hover:text-gray-500 cursor-pointer text-md"
                                     >
-                                        <FontAwesomeIcon icon={faX} />
+                                        <FontAwesomeIcon icon={faClose} />
                                     </button>
                                 )}
                                 {children}
                             </div>
                         </div>
                     </div>
-                    //     <div
-                    //     style={contStyle}
-                    //     className={`${contClass} ${
-                    //       isAnimating ? renderAnimationClass : exitAnimationClass
-                    //     }`}
-                    //   >
-                    //     <div className="w-full h-full relative">
-                    //       {/* Botón de cerrar si está habilitado */}
-                    //       {closeButton && (
-                    //         <button
-                    //           onClick={() => setIsOpen(false)}
-                    //           className="duration-400 absolute top-0 right-0 text-black dark:text-white hover:text-gray-500 cursor-pointer text-md"
-                    //         >
-                    //           <FontAwesomeIcon icon={faX} />
-                    //         </button>
-                    //       )}
-                    //       {children}
-                    //     </div>
-                    //   </div>
                     ,
-                    TCont // Contenedor donde se monta el portal
+                    TCont
                 )}
         </>
     );

@@ -15,6 +15,7 @@ export const ProductsBarChart = ({ data = [] }) => {
                     tickFormatter={(value) => truncate(value, 10)}
                 />
                 <YAxis />
+                
                 <Tooltip />
                 <Legend />
                 <Bar onClick={() => console.log('Mes')} dataKey="ingreso" fill="#00BBA7" />
