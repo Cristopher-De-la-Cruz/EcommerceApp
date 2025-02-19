@@ -3,12 +3,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 
-export const InputPassword = ({ value, onChange, name = "password", onKeyDown = () => {} }) => {
+export const InputPassword = ({ value, onChange, name = "password", inputClass = 'bg-transparent border-2 rounded-md py-1 px-2 w-full' , onKeyDown = () => {} }) => {
     const [IsShowing, setIsShowing] = useState(false);
     return (
-        <div className='relative'>
+        <div className='relative w-full'>
             <input type={IsShowing ? 'text' : 'password'}
-                className="bg-transparent border-2 rounded-md py-1 px-2 w-full"
+                className={inputClass}
                 name={name}
                 value={value}
                 onChange={onChange}
@@ -27,5 +27,6 @@ InputPassword.propTypes = {
     value: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired,
     name: PropTypes.string,
+    inputClass: PropTypes.string,
     onKeyDown: PropTypes.func,
 }

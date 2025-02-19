@@ -11,5 +11,7 @@ router.get('/', (req, res) => {controller.get(req, res)});
 router.post('/', (req, res) => {controller.store(req, res)});
 router.put('/:id', (req, res) => {controller.update(req, res)});
 router.put('/toggleState/:id', (req, res) => {controller.toggleState(req, res)});
+router.put('/account/name_email', (req, res) => {controller.editNameEmail(req, res)});
+router.put('/account/password', (req, res) => {controller.editPassword(req, res)});
 
 module.exports = router;

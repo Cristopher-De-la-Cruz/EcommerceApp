@@ -6,6 +6,7 @@ import { ThemeContext } from "../../../../context/Theme/ThemeContext";
 import { ToastContext } from "../../../../context/Toast/ToastContext";
 import { Link } from "react-router-dom";
 import { RenderWithAnimation } from "../../../RenderWithAnimation";
+import { MyAccountButton } from "../../../account/MyAccountButton";
 
 export const NavUser = () => {
     const { user, logout, isLogged } = useContext(AuthContext);
@@ -76,11 +77,7 @@ export const NavUser = () => {
                         }
                         {
                             isLogged &&
-                            <Link to="/MyAccount">
-                                <div className="w-[98%] hover:text-gray-500 py-1 border-t border-white dark:border-gray-300 flex gap-2 items-center text-md px-2">
-                                    <FontAwesomeIcon icon={faUser} /> <p>Mi Perfil</p>
-                                </div>
-                            </Link>
+                            <MyAccountButton/>
                         }
                         <button
                             onClick={toggleTheme}

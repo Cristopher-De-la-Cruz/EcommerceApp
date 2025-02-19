@@ -4,8 +4,14 @@ const back_host = config.app.back_host;
 
 const apiRoutes = {
     usuarios: {
+        get: `${back_host}api/usuarios`,
+        store: `${back_host}api/usuarios`,
+        update: `${back_host}api/usuarios/`,
+        toggleState: `${back_host}api/usuarios/toggleState/`,
         login: `${back_host}api/usuarios/login`,
         register: `${back_host}api/usuarios/register`,
+        editNameEmail: `${back_host}api/usuarios/account/name_email`,
+        editPassword: `${back_host}api/usuarios/account/password`,
     },
     categorias: {
         get: `${back_host}api/categorias`,

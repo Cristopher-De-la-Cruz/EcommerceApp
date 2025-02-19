@@ -17,7 +17,8 @@ const validate = async (validation = [], req) => {
 
             for (const fieldValue of fieldValues) {
                 // Validar si el campo es requerido
-                if (item.type != "file" && item.required && fieldValue != 0 && (!fieldValue || fieldValue === null || fieldValue === undefined)) {
+                console.log(`${item.field}: ${fieldValue != Number(0)}`)
+                if (item.type != "file" && item.required && fieldValue !== 0 && (fieldValue === null || fieldValue === undefined || fieldValue === "")) {
                     errors.hasErrors = true;
                     errors.errors.push({ message: `${item.field} es obligatorio.` });
                     continue;
@@ -74,7 +75,6 @@ const validate = async (validation = [], req) => {
                         errors.errors.push({ message: `${item.field} debe ser un ${item.type}.` });
                         continue;
                     }
-
                     // Validar longitud mínima y máxima (para strings)
                     if (item.min && fieldValue.length < item.min) {
                         errors.hasErrors = true;
@@ -87,9 +87,8 @@ const validate = async (validation = [], req) => {
 
                     // Validar valores únicos en base de datos
                     if (item.unique) {
-                        const exists = await db.query(`SELECT * FROM ${item.table} WHERE ${item.field} = ?`, [fieldValue]);
-                        const maxLength = item.updating ? 1 : 0;
-                        if (exists.length > maxLength) {
+                        const exists = await db.query(`SELECT * FROM ${item.table} WHERE ${item.field} = ? ${item.updating ? `AND id != ${item.updatingId}` : ''}`, [fieldValue]);
+                        if (exists.length > 0) {
                             errors.hasErrors = true;
                             errors.errors.push({ message: `${item.field} debe ser único.` });
                         }

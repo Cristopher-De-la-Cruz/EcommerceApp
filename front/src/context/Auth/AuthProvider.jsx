@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import Cookies from 'js-cookie';
 import bcrypt from 'bcryptjs'
 
-
 const initUser = {
     nombre: '',
     email: '',
@@ -57,8 +56,19 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const editUser = (nombre, email) => {
+        try{
+            const newUser = {...user, nombre: nombre, email: email}
+            setUser(newUser);
+            Cookies.set('user', JSON.stringify(newUser));
+            return { success: true, message: 'Usuario actualizado', status: 200 };
+        } catch(error){
+            return { success: false, message: 'Error al editar usuario', error: error, status: 500}
+        }
+    }
+
     return (
-        <AuthContext.Provider value={{ user, token, isLogged, login, logout }}>
+        <AuthContext.Provider value={{ user, editUser, token, isLogged, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
