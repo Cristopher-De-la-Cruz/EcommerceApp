@@ -18,8 +18,19 @@ export const MyOrders = () => {
 
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const [desde, setDesde] = useState(searchParams.get('desde') || '');
-    const [hasta, setHasta] = useState(searchParams.get('hasta') || '');
+    
+    const [desde, setDesde] = useState(() => {
+        const fecha = new Date();
+        fecha.setMonth(fecha.getMonth() - 1);
+        return searchParams.get('desde') || fecha.toISOString().split('T')[0];
+    });
+
+    const [hasta, setHasta] = useState(() => {
+        const fecha = new Date();
+        fecha.setMonth(fecha.getMonth() + 1);
+        return searchParams.get('hasta') || fecha.toISOString().split('T')[0];
+    });
+
     const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
     const [limit, setLimit] = useState(Number(searchParams.get('limit')) || 12);
 

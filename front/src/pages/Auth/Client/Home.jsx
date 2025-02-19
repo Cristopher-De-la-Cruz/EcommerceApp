@@ -93,9 +93,9 @@ export const Home = () => {
                 </div>
                 <div className="w-full flex sm:flex-row flex-col py-2">
                     <div className="lg:w-1/4 md:w-1/3 w-full pr-3 pb-3">
-                        <div className="w-full sm:sticky block sm:top-32">
+                        <div className="w-full h-full border-r border-zinc-500 sm:top-32">
                             <div className="w-full flex flex-col gap-2">
-                                <div className="w-full text-center border-b-2 border-zinc-500 py-1">
+                                <div className="w-full text-center border-b border-zinc-500 py-1">
                                     <h2 className="text-xl font-semibold">Filtros</h2>
                                 </div>
                                 <div className="w-full flex gap-2 items-center px-2">

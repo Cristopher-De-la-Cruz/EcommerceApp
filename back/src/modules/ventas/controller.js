@@ -15,17 +15,21 @@ const get = async (req, res) => {
         }
         const user_id = token.payload.user_id;
 
-        const where = token.payload.user_role == 1 ? 'WHERE 1=1' : `WHERE cliente_id = ${user_id}`
+        const where = token.payload.user_role == 1 ? 'WHERE 1=1' : `WHERE v.cliente_id = ${user_id}`
         const { desde, hasta, page = 1, limit = 12 } = req.query;
 
-        let query = `SELECT * FROM ${TABLA} ${where}`;
+        let query = `SELECT v.*, c.nombre as cliente
+            FROM ${TABLA} as v
+            INNER JOIN usuarios c ON v.cliente_id = c.id
+            ${where}
+            `;
         const params = [];
         if (desde) {
-            query += ' AND fecha >= ?';
+            query += ' AND v.fecha >= ?';
             params.push(desde);
         }
         if (hasta) {
-            query += ' AND fecha <= ?';
+            query += ' AND v.fecha <= ?';
             params.push(hasta);
         }
 
@@ -84,9 +88,13 @@ const show = async (req, res) => {
             return;
         }
 
-        const where = token.payload.user_role == 1 ? 'WHERE 1=1' : `WHERE cliente_id = ${user_id}`;
+        const where = token.payload.user_role == 1 ? 'WHERE 1=1' : `WHERE v.cliente_id = ${user_id}`;
 
-        let query = `SELECT * FROM ${TABLA} ${where} AND id = ?`;
+        let query = `SELECT v.*, c.nombre as cliente
+        FROM ${TABLA} as v
+        INNER JOIN usuarios c ON v.cliente_id = c.id
+        ${where} AND v.id = ?`;
+
         const params = [req.params.id];
 
         const items = await bd.query(query, params);

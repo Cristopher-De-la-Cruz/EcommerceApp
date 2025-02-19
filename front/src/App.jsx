@@ -17,6 +17,7 @@ import { AdminCategories } from "./pages/Auth/Admin/AdminCategories"
 import { AdminSales } from "./pages/Auth/Admin/AdminSales"
 import { AdminUsers } from "./pages/Auth/Admin/AdminUsers"
 import { AdminProductImages } from "./pages/Auth/Admin/AdminProductImages"
+import { AdminSale } from "./pages/Auth/Admin/AdminSale"
 
 export const App = () => {
   return (
@@ -42,6 +43,7 @@ export const App = () => {
               <Route path="/admin/producto/:NombreId/imagenes" element={<AdminProductImages />} />
               <Route path="/admin/categorias" element={<AdminCategories />} />
               <Route path="/admin/ventas" element={<AdminSales />} />
+              <Route path="/admin/venta/:id" element={<AdminSale />} />
               <Route path="/admin/users" element={<AdminUsers />} />
             </Routes>
           </AuthProvider>
